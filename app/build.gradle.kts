@@ -89,4 +89,5 @@ dependencies {
     implementation("io.socket:socket.io-client:2.0.0")
     implementation ("org.jetbrains.kotlin:kotlin-script-runtime:1.5.31")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("com.google.code.gson:gson:2.8.8")
 }

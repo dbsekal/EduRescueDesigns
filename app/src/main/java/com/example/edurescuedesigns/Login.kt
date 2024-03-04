@@ -1,5 +1,6 @@
 package com.example.edurescuedesigns
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
 
 @Composable
 fun LoginForm(navController: NavController) {
@@ -76,8 +78,29 @@ fun PasswordField(
     )
 }
 
+data class LoginResponse(
+    val emailError : Boolean,
+    val passwordError : Boolean,
+    val token : String,
+    val message : String
+)
+
 fun submitLogin(email: String, password: String) {
     Network().login(email = email, password = password)
+        .thenAccept{ response ->
+            Log.d("SERVER RES:", response)
+
+            val gson = Gson()
+            val loginResponse = gson.fromJson(response, LoginResponse::class.java)
+            if (loginResponse.emailError) {
+                Log.d("LOGIN RES",loginResponse.message)
+            } else if (loginResponse.passwordError){
+                Log.d("LOGIN RES", loginResponse.message)
+            } else {
+                Log.d("LOGIN RES", loginResponse.message)
+            }
+
+        }
 }
 
 @Composable
