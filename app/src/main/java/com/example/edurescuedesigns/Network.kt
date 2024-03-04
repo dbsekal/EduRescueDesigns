@@ -1,6 +1,7 @@
 package com.example.edurescuedesigns
 
 import android.util.Log
+import java.util.concurrent.CompletableFuture
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
@@ -19,14 +20,15 @@ class Network {
        prompt the user accordingly*/
 
     /*TODO - This may require you to change the Node.js server to return what you want*/
-    fun login(email: String, password: String)  {
+    fun login(email: String, password: String) : CompletableFuture<String> {
+        val promise = CompletableFuture<String>()
         try {
             Log.d("LOGIN ATTEMPT:", "$email --- $password")
             val url = "http://10.0.2.2:8008/account/login"
             val json = """
             {
-            "email": "$email",
-            "password": "$password"
+                "email": "$email",
+                "password": "$password"
             }
         """.trimIndent()
 
@@ -35,7 +37,9 @@ class Network {
             Client.newCall(request).enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
                     if (!response.isSuccessful) {
+                        promise.completeExceptionally(Exception("ERROR: Failed to login"))
                     } else {
+                        promise.complete(response.body!!.string())
                         Log.d("LOGIN ATTEMPT:", response.body!!.string())
                     }
                 }
@@ -47,6 +51,7 @@ class Network {
         } catch (e: Exception) {
             Log.e("LOGIN ATTEMPT:", "Error: ${e.message}")
         }
+        return promise
     }
     /*TODO- Create a register function that hits our API*/
 }
