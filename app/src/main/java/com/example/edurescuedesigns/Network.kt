@@ -9,7 +9,12 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
+/*
+error: true
+passwordError: true
+emailError: false
 
+*/
 
 class Network {
     private val MEDIA_TYPE_MARKDOWN = "application/json".toMediaType()
@@ -49,4 +54,7 @@ class Network {
         }
     }
     /*TODO- Create a register function that hits our API*/
+
+
+
 }
