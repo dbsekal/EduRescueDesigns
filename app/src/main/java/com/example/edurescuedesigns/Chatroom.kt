@@ -1,6 +1,5 @@
 import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -8,14 +7,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.edurescuedesigns.ChatMessage
-import com.example.edurescuedesigns.LoginResponse
 import com.example.edurescuedesigns.Network
 import com.example.edurescuedesigns.SocketManager
-import com.example.edurescuedesigns.User
-import com.google.gson.Gson
-import io.socket.client.Socket
-import org.json.JSONObject
-
+import com.example.edurescuedesigns.datatypes.User
 
 
 @Composable

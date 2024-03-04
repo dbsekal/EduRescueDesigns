@@ -1,8 +1,9 @@
 package com.example.edurescuedesigns
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.example.edurescuedesigns.datatypes.LoginResponse
+import com.example.edurescuedesigns.datatypes.User
 import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
