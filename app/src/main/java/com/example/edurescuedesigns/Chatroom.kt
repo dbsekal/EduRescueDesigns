@@ -26,14 +26,10 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance()) {
     LaunchedEffect(Unit) {
         if (!user.validToken) {
             // Fetch user info only if the user token is not valid
-            Network().getUserInfo().thenAccept { response ->
-                Log.d("SERVER RES:", response)
-                val gson = Gson()
-                val loginResponse = gson.fromJson(response, User::class.java)
-
-                if (loginResponse.validToken) {
+            Network().getUserInfo().thenAccept { userRes ->
+                if (userRes.validToken) {
                     Log.d("Token RES", "valid")
-                    user = loginResponse
+                    user = userRes
                 } else {
                     Log.d("Token RES", "invalid")
                 }

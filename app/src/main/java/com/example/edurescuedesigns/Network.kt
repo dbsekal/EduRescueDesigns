@@ -26,8 +26,8 @@ class Network {
        prompt the user accordingly*/
 
     /*TODO - This may require you to change the Node.js server to return what you want*/
-    fun login(email: String, password: String) : CompletableFuture<String>{
-        val promise = CompletableFuture<String>()
+    fun login(email: String, password: String) : CompletableFuture<LoginResponse>{
+        val promise = CompletableFuture<LoginResponse>()
         try {
             Log.d("LOGIN ATTEMPT:", "$email --- $password")
             val url = "http://10.0.2.2:8008/account/login"
@@ -44,13 +44,13 @@ class Network {
             Client.newCall(request).enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
                     var responseBody = response.body!!.string()
+                    val gson = Gson()
+                    val loginResponse = gson.fromJson(StringReader(responseBody), LoginResponse::class.java)
                     if (!response.isSuccessful) {
-                        promise.complete(responseBody)
+                        promise.complete(loginResponse)
                     } else {
-                        val gson = Gson()
-                        val loginResponse = gson.fromJson(StringReader(responseBody), LoginResponse::class.java)
                         setToken(loginResponse.token)
-                        promise.complete(responseBody)
+                        promise.complete(loginResponse)
                         Log.d("LOGIN ATTEMPT:", responseBody)
                     }
                 }
@@ -90,8 +90,8 @@ class Network {
 
     //getUserInfo sends the backend a JWT token to both see if user is authorized and also
     //Returns that users info - Justin
-    fun getUserInfo(): CompletableFuture<String> {
-        val promise = CompletableFuture<String>()
+    fun getUserInfo(): CompletableFuture<User> {
+        val promise = CompletableFuture<User>()
 
         val token = getToken()
 
@@ -103,11 +103,13 @@ class Network {
                 .build()
             Client.newCall(request).enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
-                    val responseBody = response.body!!.string()
+                    var responseBody = response.body!!.string()
+                    val gson = Gson()
+                    val user = gson.fromJson(StringReader(responseBody), User::class.java)
                     if (!response.isSuccessful) {
-                        promise.complete(responseBody)
+                        promise.complete(user)
                     } else {
-                        promise.complete(responseBody)
+                        promise.complete(user)
                         Log.d("JUSTIN", responseBody)
                     }
                 }

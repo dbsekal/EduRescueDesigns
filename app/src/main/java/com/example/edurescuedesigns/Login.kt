@@ -82,15 +82,12 @@ fun PasswordField(
 fun submitLogin(email: String, password: String) {
     Network().login(email = email, password = password)
         .thenAccept{ response ->
-            Log.d("SERVER RES:", response)
-            val gson = Gson()
-            val loginResponse = gson.fromJson(response, LoginResponse::class.java)
-            if (loginResponse.emailError) {
-                Log.d("LOGIN RES",loginResponse.message)
-            } else if (loginResponse.passwordError){
-                Log.d("LOGIN RES", loginResponse.message)
+            if (response.emailError) {
+                Log.d("LOGIN RES",response.message)
+            } else if (response.passwordError){
+                Log.d("LOGIN RES", response.message)
             } else {
-                Log.d("LOGIN RES", loginResponse.message)
+                Log.d("LOGIN RES", response.message)
             }
 
         }
