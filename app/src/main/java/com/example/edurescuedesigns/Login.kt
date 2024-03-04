@@ -1,6 +1,7 @@
 package com.example.edurescuedesigns
 
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -78,18 +79,10 @@ fun PasswordField(
     )
 }
 
-data class LoginResponse(
-    val emailError : Boolean,
-    val passwordError : Boolean,
-    val token : String,
-    val message : String
-)
-
 fun submitLogin(email: String, password: String) {
     Network().login(email = email, password = password)
         .thenAccept{ response ->
             Log.d("SERVER RES:", response)
-
             val gson = Gson()
             val loginResponse = gson.fromJson(response, LoginResponse::class.java)
             if (loginResponse.emailError) {
@@ -105,9 +98,6 @@ fun submitLogin(email: String, password: String) {
 
 @Composable
 fun LoginButton(email: String, password: String) {
-
-
-
     Button(onClick = {submitLogin(email,password)}) {
         Text("Login")
     }

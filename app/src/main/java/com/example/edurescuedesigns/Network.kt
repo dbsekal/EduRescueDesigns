@@ -1,6 +1,9 @@
 package com.example.edurescuedesigns
 
+import android.content.SharedPreferences
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
@@ -9,18 +12,15 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
+import java.io.StringReader
 import java.util.concurrent.CompletableFuture
 
-/*
-error: true
-passwordError: true
-emailError: false
-
-*/
 
 class Network {
     private val MEDIA_TYPE_MARKDOWN = "application/json".toMediaType()
     private val Client = OkHttpClient()
+    private val context = ContextSingleton.getInstance().getContext()
+    private val sharedpref = context.getSharedPreferences("preferences", AppCompatActivity.MODE_PRIVATE)
     /*TODO - Have both the login function and register function return helpful error information
        For example: if the password is wrong, send a boolean passwordError: true so that the UI can
        prompt the user accordingly*/
@@ -40,12 +40,16 @@ class Network {
 
             val request = Request.Builder().url(url).post(json.toRequestBody(MEDIA_TYPE_MARKDOWN)).build()
             //This enqueue function is sortof like async in JavaScript
+
             Client.newCall(request).enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
+                    var responseBody = response.body!!.string()
                     if (!response.isSuccessful) {
-                        //promise.completeExceptionally(Exception("ERROR: Failed to login"))
+                        promise.complete(responseBody)
                     } else {
-                        var responseBody = response.body!!.string()
+                        val gson = Gson()
+                        val loginResponse = gson.fromJson(StringReader(responseBody), LoginResponse::class.java)
+                        setToken(loginResponse.token)
                         promise.complete(responseBody)
                         Log.d("LOGIN ATTEMPT:", responseBody)
                     }
@@ -63,6 +67,61 @@ class Network {
     }
     /*TODO- Create a register function that hits our API*/
 
+
+    fun setToken(token:String){
+        val editor = sharedpref.edit()
+        editor.putString("token", token).apply()
+    }
+    fun getToken():String{
+        val token = sharedpref.getString("token", null)
+        if(token != null) {
+            Log.d("TOKEN VAL: ", token)
+            return token
+        }
+        Log.d("TOKEN VAL: ", "unintialized")
+        return ""
+
+    }
+    fun removeToken() {
+        val editor = sharedpref.edit()
+        editor.remove("token").apply()
+    }
+
+
+    //getUserInfo sends the backend a JWT token to both see if user is authorized and also
+    //Returns that users info - Justin
+    fun getUserInfo(): CompletableFuture<String> {
+        val promise = CompletableFuture<String>()
+
+        val token = getToken()
+
+        try {
+            val url = "http://10.0.2.2:8008/account/getinfo"
+            val request = Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer $token")
+                .build()
+            Client.newCall(request).enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    val responseBody = response.body!!.string()
+                    if (!response.isSuccessful) {
+                        promise.complete(responseBody)
+                    } else {
+                        promise.complete(responseBody)
+                        Log.d("JUSTIN", responseBody)
+                    }
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e("JUSTIN", "Error: ${e.message}")
+                }
+            })
+        } catch (e: Exception) {
+            Log.e("JUSTIN", "Error: ${e.message}")
+        }
+
+        return promise
+    }
 
 
 }

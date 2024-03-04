@@ -1,9 +1,9 @@
 package com.example.edurescuedesigns
 
 data class User(
-    val username: String,
-    val studentid: String,
-    val email: String,
-    val profilepic: String, //url
+    val firstName : String = "",
+    val lastName : String = "",
+    val email : String = "",
+    val id: Int = -1,
+    val validToken: Boolean = false
 )
-
