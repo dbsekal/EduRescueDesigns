@@ -1,6 +1,7 @@
 package com.example.edurescuedesigns.classes
 
 import com.example.edurescuedesigns.datatypes.ChatMessage
+import com.example.edurescuedesigns.datatypes.User
 import io.socket.client.IO
 import io.socket.client.Socket
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +36,7 @@ class SocketManager private constructor() {
         //When emitting a message
         socket.on("message") { args ->
             val jsonMessage = args[0] as JSONObject
-            val sender = jsonMessage.optString("username", "Unknown")
+            val sender = jsonMessage.optString("sender", "Unknown")
             val message = jsonMessage.getString("message")
             val timestamp = System.currentTimeMillis() // Current timestamp
             val chatMessage = ChatMessage(sender, message, timestamp)
@@ -57,10 +58,12 @@ class SocketManager private constructor() {
         }
     }
 
-    fun sendMessage(message: String) {
+    fun sendMessage(message: String, user: User) {
         //Emits message to broadcast to entire server
         val jsonMessage = JSONObject().apply {
             put("message", message)
+            put("sender", "${user.firstName} ${user.lastName}")
+            put("email", user.email)
             // Add other data as needed
         }
         socket.emit("message", jsonMessage)
