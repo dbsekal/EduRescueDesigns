@@ -1,5 +1,6 @@
-package com.example.edurescuedesigns
+package com.example.edurescuedesigns.classes
 
+import com.example.edurescuedesigns.datatypes.ChatMessage
 import io.socket.client.IO
 import io.socket.client.Socket
 import kotlinx.coroutines.flow.Flow

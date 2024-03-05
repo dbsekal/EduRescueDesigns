@@ -1,20 +1,15 @@
 package com.example.edurescuedesigns
 import ChatRoomScreen
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.*
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.edurescuedesigns.datatypes.User
+import com.example.edurescuedesigns.classes.ContextSingleton
+import com.example.edurescuedesigns.classes.Network
 
 
 class MainActivity : AppCompatActivity() {

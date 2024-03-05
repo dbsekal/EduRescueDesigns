@@ -1,4 +1,4 @@
-package com.example.edurescuedesigns
+package com.example.edurescuedesigns.datatypes
 
 
 data class ChatMessage(

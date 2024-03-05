@@ -7,9 +7,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.edurescuedesigns.ChatMessage
-import com.example.edurescuedesigns.Network
-import com.example.edurescuedesigns.SocketManager
+import com.example.edurescuedesigns.datatypes.ChatMessage
+import com.example.edurescuedesigns.classes.Network
+import com.example.edurescuedesigns.classes.SocketManager
 import com.example.edurescuedesigns.datatypes.User
 import java.util.Date
 import java.util.Locale

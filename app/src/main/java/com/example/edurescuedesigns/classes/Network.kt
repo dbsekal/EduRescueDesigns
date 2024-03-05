@@ -1,4 +1,4 @@
-package com.example.edurescuedesigns
+package com.example.edurescuedesigns.classes
 
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
