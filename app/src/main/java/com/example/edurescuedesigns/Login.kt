@@ -2,6 +2,7 @@ package com.example.edurescuedesigns
 
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -28,14 +29,23 @@ fun LoginForm(navController: NavController) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
 
+
     Column {
+        Text(
+            text = "EduRescue",
+            style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.padding(8.dp)
+        )
         EmailField(email.value) { email.value = it }
         PasswordField(email.value, password.value) { password.value = it }
         LoginButton(email.value, password.value)
+        RegisterButton()
         Button(onClick = { navController.navigate("chatroom") }) {
             Text("Chatroom")
         }
     }
+
+
 }
 
 @Composable
@@ -98,6 +108,14 @@ fun submitLogin(email: String, password: String) {
 fun LoginButton(email: String, password: String) {
     Button(onClick = {submitLogin(email,password)}) {
         Text("Login")
+    }
+}
+
+@Composable
+fun RegisterButton() {
+    Button(onClick = { /*TODO*/ }) {
+        Text("Signup")
+
     }
 }
 
