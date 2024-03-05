@@ -1,3 +1,4 @@
+import android.icu.text.SimpleDateFormat
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -10,6 +11,9 @@ import com.example.edurescuedesigns.ChatMessage
 import com.example.edurescuedesigns.Network
 import com.example.edurescuedesigns.SocketManager
 import com.example.edurescuedesigns.datatypes.User
+import java.util.Date
+import java.util.Locale
+
 
 
 @Composable
@@ -52,7 +56,7 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance()) {
         // Display chat messages
         Column {
             for (chatMessage in chatMessages) {
-                Text("${chatMessage.sender}: ${chatMessage.message} (${chatMessage.timestamp})")
+                Text("${user.firstName} ${user.lastName}: ${chatMessage.message} (${formatTime(chatMessage.timestamp)})")
             }
         }
 
@@ -77,5 +81,16 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance()) {
         ) {
             Text("Send")
         }
+    }
+}
+
+
+fun formatTime(timestamp: Long): String {
+    val sdf = SimpleDateFormat("hh:mm a", Locale.US)
+    return try {
+        val netDate = Date(timestamp)
+        sdf.format(netDate)
+    } catch (e: Exception) {
+        e.toString()
     }
 }
