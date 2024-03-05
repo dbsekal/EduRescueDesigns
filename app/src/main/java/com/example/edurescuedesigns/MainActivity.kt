@@ -3,11 +3,18 @@ import ChatRoomScreen
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.*
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.edurescuedesigns.datatypes.User
 
 
 class MainActivity : AppCompatActivity() {
@@ -15,12 +22,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ContextSingleton.initialize(this)
         //REMOVE THIS LINE TO SAVE LOGIN DATA
+
         //Network().removeToken()
+
+        //Check if user is already logged in
+        var startDestination:String = "login"
+            Network().getUserInfo().thenAccept { userRes ->
+                if (userRes.validToken) {
+                    Log.d("Token RES", "valid")
+                    startDestination = "homepage"
+                } else {
+                    Log.d("Token RES", "invalid")
+                }
+            }
+
+
+
         setContent {
             MaterialTheme {
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = "login" ){
+                NavHost(navController = navController, startDestination = startDestination){
                     composable(route="login"){
                         LoginForm(navController)
                     }
@@ -28,7 +50,7 @@ class MainActivity : AppCompatActivity() {
                         ChatRoomScreen()
                     }
                     composable(route="homepage"){
-                        HomePage()
+                        HomePage(navController)
                     }
                 }
             }

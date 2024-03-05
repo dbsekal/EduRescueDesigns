@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginForm(navController: NavController) {
@@ -37,12 +40,9 @@ fun LoginForm(navController: NavController) {
             modifier = Modifier.padding(8.dp)
         )
         EmailField(email.value) { email.value = it }
-        PasswordField(email.value, password.value) { password.value = it }
-        LoginButton(email.value, password.value)
+        PasswordField(email.value, password.value, { password.value = it },navController = navController)
+        LoginButton(email.value, password.value, navController)
         RegisterButton()
-        Button(onClick = { navController.navigate("chatroom") }) {
-            Text("Chatroom")
-        }
     }
 
 
@@ -72,7 +72,8 @@ fun EmailField(
 fun PasswordField(
     emailValue: String,
     passwordValue: String,
-    onPasswordChange: (String) -> Unit
+    onPasswordChange: (String) -> Unit,
+    navController: NavController
 ) {
     OutlinedTextField(
         value = passwordValue,
@@ -84,12 +85,12 @@ fun PasswordField(
             imeAction = ImeAction.Done
         ),
         keyboardActions = KeyboardActions(
-            onDone = {submitLogin(emailValue,passwordValue)}
+            onDone = {submitLogin(emailValue,passwordValue, navController)}
         )
     )
 }
 
-fun submitLogin(email: String, password: String) {
+fun submitLogin(email: String, password: String,navController: NavController) {
 
     Network().login(email = email, password = password)
         .thenAccept{ response ->
@@ -99,14 +100,17 @@ fun submitLogin(email: String, password: String) {
                 Log.d("LOGIN RES", response.message)
             } else {
                 Log.d("LOGIN RES", response.message)
+                CoroutineScope(Dispatchers.Main).launch {
+                    navController.navigate("homepage")
+                }
             }
 
         }
 }
 
 @Composable
-fun LoginButton(email: String, password: String) {
-    Button(onClick = {submitLogin(email,password)}) {
+fun LoginButton(email: String, password: String,navController: NavController) {
+    Button(onClick = {submitLogin(email,password, navController)}) {
         Text("Login")
     }
 }
