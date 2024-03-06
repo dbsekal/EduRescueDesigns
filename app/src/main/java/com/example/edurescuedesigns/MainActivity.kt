@@ -18,18 +18,19 @@ class MainActivity : AppCompatActivity() {
         ContextSingleton.initialize(this)
         //REMOVE THIS LINE TO SAVE LOGIN DATA
 
-        Network().removeToken()
+       //Network().removeToken()
 
         //Check if user is already logged in
         var startDestination:String = "login"
-            Network().getUserInfo().thenAccept { userRes ->
-                if (userRes.validToken) {
-                    Log.d("Token RES", "valid")
-                    startDestination = "homepage"
-                } else {
+
+        Network().getUserInfo().thenAccept { userRes ->
+            if (userRes.validToken) {
+                Log.d("Token RES", "valid")
+                startDestination = "homepage"
+            } else {
                     Log.d("Token RES", "invalid")
-                }
             }
+        }
 
 
 
@@ -42,7 +43,7 @@ class MainActivity : AppCompatActivity() {
                         LoginForm(navController)
                     }
                     composable(route="chatroom"){
-                        ChatRoomScreen()
+                        ChatRoomScreen(navController = navController)
                     }
                     composable(route="homepage"){
                         HomePage(navController)
