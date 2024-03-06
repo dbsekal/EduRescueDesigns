@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.edurescuedesigns.classes.ContextSingleton
 import com.example.edurescuedesigns.classes.Network
+import com.example.edurescuedesigns.ui.theme.AppTheme
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,10 +36,12 @@ class MainActivity : AppCompatActivity() {
 
 
         setContent {
-            MaterialTheme {
+            AppTheme {
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = startDestination){
+                NavHost(
+                    navController = navController,
+                    startDestination = startDestination){
                     composable(route="login"){
                         LoginForm(navController)
                     }
