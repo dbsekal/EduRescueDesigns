@@ -56,7 +56,7 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance()) {
         // Display chat messages
         Column {
             for (chatMessage in chatMessages) {
-                Text("${user.firstName} ${user.lastName}: ${chatMessage.message} (${formatTime(chatMessage.timestamp)})")
+                Text("${chatMessage.sender} : ${chatMessage.message} (${formatTime(chatMessage.timestamp)})")
             }
         }
 
@@ -73,7 +73,7 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance()) {
         Button(
             onClick = {
                 if (newMessage.isNotEmpty()) {
-                    socketManager.sendMessage(newMessage)
+                    socketManager.sendMessage(newMessage,user)
                     newMessage = ""
                 }
             },
