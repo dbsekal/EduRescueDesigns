@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.edurescuedesigns.classes.ContextSingleton
 import com.example.edurescuedesigns.classes.Network
+import com.example.edurescuedesigns.ui.theme.AppTheme
 
 
 class MainActivity : AppCompatActivity() {
@@ -18,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         ContextSingleton.initialize(this)
         //REMOVE THIS LINE TO SAVE LOGIN DATA
 
-//        Network().removeToken()
+        Network().removeToken()
 
         //Check if user is already logged in
         var startDestination:String = "login"
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
 
         setContent {
-            MaterialTheme {
+            AppTheme {
                 val navController = rememberNavController()
 
                 NavHost(
