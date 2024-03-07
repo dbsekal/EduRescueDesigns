@@ -310,7 +310,11 @@ fun clickRegister(
     Log.d("HELP", "ran")
     Network().register(firstName, lastName, email, password, id)
         .thenAccept { response ->
-            if (response.emailError || response.passwordError) {
+            if (response.emailError) {
+                // front end text for email is red
+                Log.d("LOGIN RES", response.message)
+            } else if (response.passwordError){
+                // front end text for password is wrong
                 Log.d("LOGIN RES", response.message)
             } else {
                 Log.d("LOGIN RES", response.message)
