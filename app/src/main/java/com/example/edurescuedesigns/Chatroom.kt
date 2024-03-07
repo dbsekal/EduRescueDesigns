@@ -1,6 +1,6 @@
 import android.icu.text.SimpleDateFormat
 import android.util.Log
-//import coil.compose.AsyncImage
+import coil.compose.AsyncImage
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -22,6 +22,15 @@ import java.util.Date
 import java.util.Locale
 
 
+fun formatTime(timestamp: Long): String {
+    val sdf = SimpleDateFormat("hh:mm a", Locale.US)
+    return try {
+        val netDate = Date(timestamp)
+        sdf.format(netDate)
+    } catch (e: Exception) {
+        e.toString()
+    }
+}
 
 
 @Composable
@@ -41,9 +50,8 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
                     user = userRes
                     socketManager.joinRoom(user)
 
-                    Network().getChatRoomMessages(user.enrollment).thenAccept(){
-                            messages ->
-                        if(messages.isNotEmpty()){
+                    Network().getChatRoomMessages(user.enrollment).thenAccept() { messages ->
+                        if (messages.isNotEmpty()) {
                             chatMessages = chatMessages + messages
                         }
                     }
@@ -60,16 +68,14 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
         }
 
 
-
     }
 
-/*TODO @Katelynn
+    /*TODO @Katelynn
    1. Design this page
    2. Take the user variable and make the messages display their name
    3. Add a hover effect on the user's name to display email
    Note: User data class can be found at User.kt. You need to login to intialize the user (will fix)
  */
-
 
 
     //We listen for messages vie flow. Find the Flow in SocketManager.kt
@@ -83,49 +89,41 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
         // Display chat messages
         Column(modifier = Modifier.weight(1f)) {
             for (chatMessage in chatMessages) {
-                //need to figure out how to display profile pic - Katelynn
-//                Row(verticalAlignment = Alignment.CenterVertically) {
-//                    AysncImage(
-//                        model = chatMessage.profilepic,
-//                        contentDescription = null,
-//                        modifier = Modifier.size(32.dp)
-//                    )
-                Text("${chatMessage.sender} : ${chatMessage.message} (${formatTime(chatMessage.timestamp)})")
-            }
-            Spacer(modifier = Modifier.weight(1f))
-        }
-
-        // Input field for sending messages
-        TextField(
-            value = newMessage,
-            onValueChange = { newMessage = it },
-            modifier = Modifier.padding(vertical = 16.dp),
-            label = { Text("Message") },
-            singleLine = true,
-        )
-
-        // Button to send messages
-        Button(
-            onClick = {
-                if (newMessage.isNotEmpty()) {
-                    socketManager.sendMessage(newMessage,user)
-                    newMessage = ""
+//                need to figure out how to display profile pic - Katelynn
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    AsyncImage(
+                        model = chatMessage.profilepic,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Text("${chatMessage.sender} : ${chatMessage.message} (${formatTime(chatMessage.timestamp)})")
                 }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Send")
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            // Input field for sending messages
+            TextField(
+                value = newMessage,
+                onValueChange = { newMessage = it },
+                modifier = Modifier.padding(vertical = 16.dp),
+                label = { Text("Message") },
+                singleLine = true,
+            )
+
+            // Button to send messages
+            Button(
+                onClick = {
+                    if (newMessage.isNotEmpty()) {
+                        socketManager.sendMessage(newMessage, user)
+                        newMessage = ""
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Send")
+            }
         }
     }
 }
 
 
-fun formatTime(timestamp: Long): String {
-    val sdf = SimpleDateFormat("hh:mm a", Locale.US)
-    return try {
-        val netDate = Date(timestamp)
-        sdf.format(netDate)
-    } catch (e: Exception) {
-        e.toString()
-    }
-}
