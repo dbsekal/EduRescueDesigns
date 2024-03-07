@@ -47,8 +47,11 @@ class MainActivity : AppCompatActivity() {
                     composable(route="chatroom"){
                         ChatRoomScreen()
                     }
+                    composable(route = "register"){
+                        RegisterForm(navController)
+                    }
                     composable(route="homepage"){
-                        HomePage(navController)
+                        HomePageForm(navController)
                     }
                 }
             }

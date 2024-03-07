@@ -10,7 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -26,6 +31,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,7 +61,7 @@ fun LoginForm(navController: NavController) {
             ClickableText(
                 text = AnnotatedString("Sign Up Here"),
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = { navController.navigate("Register" ) },
+                onClick = { navController.navigate("register") },
                 style = TextStyle(
                     fontSize = 14.sp,
                     fontFamily = FontFamily.Default,
@@ -84,7 +91,8 @@ fun EmailField(
 ) {
     OutlinedTextField(
         value = emailValue,
-        onValueChange = {input -> onEmailChange(input.replace("\\s".toRegex(), ""))},
+        onValueChange = onEmailChange,
+//        onValueChange = {input -> onEmailChange(input.replace("\\s".toRegex(), ""))},
         modifier = Modifier.padding(8.dp),
         label = { Text("Email") },
         keyboardOptions = KeyboardOptions.Default.copy(
@@ -104,18 +112,46 @@ fun PasswordField(
     onPasswordChange: (String) -> Unit,
     navController: NavController
 ) {
+    var showPassword = remember { mutableStateOf(value = false)}
+
     OutlinedTextField(
         value = passwordValue,
-        onValueChange = {input -> onPasswordChange(input.replace("\\s".toRegex(), ""))},
+        onValueChange = onPasswordChange,
+//        onValueChange = {input -> onPasswordChange(input.replace("\\s".toRegex(), ""))},
         modifier = Modifier.padding(8.dp),
         label = { Text("Password") },
+        visualTransformation = if (showPassword.value){
+            VisualTransformation.None
+        } else {
+               PasswordVisualTransformation()
+               },
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done
         ),
         keyboardActions = KeyboardActions(
             onDone = {submitLogin(emailValue,passwordValue, navController)}
-        )
+        ),
+        trailingIcon = {
+            if (showPassword.value) {
+                IconButton(
+                    onClick = { showPassword.value = false }) {
+                    Icon(
+                        imageVector = Icons.Filled.Visibility,
+                        contentDescription = "hide_password"
+                    )
+                }
+            }else {
+                IconButton(
+                    onClick = { showPassword.value = true}) {
+                    Icon (
+                        imageVector = Icons.Filled.VisibilityOff,
+                        contentDescription = "hide_password"
+                    )
+                }
+            }
+
+        }
     )
 }
 
