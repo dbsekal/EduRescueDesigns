@@ -2,6 +2,7 @@
 
 package com.example.edurescuedesigns
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,6 +39,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.edurescuedesigns.classes.Network
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -77,9 +85,9 @@ fun RegisterForm(navController: NavController) {
         DropDownUser()
 //        DropDownUser(userSelection.value){userSelection.value = it}
         IDField(studentID.value) {studentID.value = it}
-        RegisterButton()
-
-
+        // put a temporary type for now
+        RegisterButton(firstName.value, lastName.value, email.value, password.value, studentID.value.toInt(), navController)
+        //RegisterButton(firstName.value, lastName.value, navController)
 
     }
 
@@ -253,17 +261,17 @@ fun DropDownUser() {
 
 @Composable
 fun IDField(
-    iDValue: String,
+    idValue: String,
     onIDChange: (String) -> Unit
 )
 {
     OutlinedTextField(
-        value = iDValue,
+        value = idValue,
         onValueChange = onIDChange,
         modifier = Modifier.padding(8.dp),
         label = { Text(text ="ID") },
         keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Text,
+            keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Next
         ),
         keyboardActions = KeyboardActions(
@@ -273,8 +281,43 @@ fun IDField(
 }
 
 @Composable
-fun RegisterButton() {
-    Button(onClick = {/*todo*/}) {
+fun RegisterButton(
+    firstName: String,
+    lastName: String,
+    email: String,
+    password: String,
+    id: Int,
+    navController: NavController
+) {
+    Button(
+        onClick = {
+            // Call the clickRegister function from within the composable function
+            clickRegister(firstName, lastName, email, password, id, navController)
+        }
+    ) {
         Text("Sign Up")
     }
 }
+
+fun clickRegister(
+    firstName: String,
+    lastName: String,
+    email: String,
+    password: String,
+    id: Int,
+    navController: NavController
+) {
+    Log.d("HELP", "ran")
+    Network().register(firstName, lastName, email, password, id)
+        .thenAccept { response ->
+            if (response.emailError || response.passwordError) {
+                Log.d("LOGIN RES", response.message)
+            } else {
+                Log.d("LOGIN RES", response.message)
+                navController.navigate("login")
+            }
+        }
+}
+
+
+

@@ -4,10 +4,12 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.edurescuedesigns.datatypes.ChatMessage
 import com.example.edurescuedesigns.datatypes.LoginResponse
+import com.example.edurescuedesigns.datatypes.RegisterResponse
 import com.example.edurescuedesigns.datatypes.User
 import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -18,6 +20,9 @@ import org.json.JSONObject
 import java.io.IOException
 import java.io.StringReader
 import java.util.concurrent.CompletableFuture
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 
 class Network {
@@ -69,7 +74,55 @@ class Network {
 
         return promise
     }
-    /*TODO- Create a register function that hits our API*/
+//    suspend
+    fun register(firstName : String,
+                         lastName : String,
+                         email : String,
+                         password : String,
+                         id : Int,
+                         //type : String
+        ): CompletableFuture<RegisterResponse> {
+        val promise = CompletableFuture<RegisterResponse>()
+
+        try {
+            Log.d("REGISTERING WITH:", "$firstName $lastName w/ $email & $password & $id")
+            val url = "http://10.0.2.2:8008/account/register"
+
+            val request = Request.Builder()
+                .url(url)
+                .build()
+
+//            return suspendCoroutine { continuation ->
+//
+            Client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    //continuation.resumeWithException(e)
+                    Log.e("REGISTER ERROR:",  "${e.message}")
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val responseBody = response.body!!.string()
+                    val regResponse = Gson().fromJson(responseBody, RegisterResponse::class.java)
+                    if (!response.isSuccessful) {
+                        //continuation.resume(regResponse)
+                        promise.complete(regResponse)
+                    } else {
+                        //continuation.resume(regResponse)
+                        promise.complete(regResponse)
+                        Log.d("REGISTER RESPONSE:", responseBody)
+                    }
+                }
+
+            })
+            //}
+
+        } catch (e: Exception) {
+            Log.e("REGISTER ERROR:", "${e.message}")
+            //return RegisterResponse(emailError = true, passwordError = true, "ERROR")
+        }
+
+        return promise
+    }
 
 
     fun setToken(token:String){
