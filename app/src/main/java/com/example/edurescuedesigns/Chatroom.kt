@@ -1,10 +1,13 @@
 import android.icu.text.SimpleDateFormat
 import android.util.Log
+//import coil.compose.AsyncImage
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -17,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
+
 
 
 
@@ -77,10 +81,18 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
 
     Column(modifier = Modifier.padding(16.dp)) {
         // Display chat messages
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             for (chatMessage in chatMessages) {
+                //need to figure out how to display profile pic - Katelynn
+//                Row(verticalAlignment = Alignment.CenterVertically) {
+//                    AysncImage(
+//                        model = chatMessage.profilepic,
+//                        contentDescription = null,
+//                        modifier = Modifier.size(32.dp)
+//                    )
                 Text("${chatMessage.sender} : ${chatMessage.message} (${formatTime(chatMessage.timestamp)})")
             }
+            Spacer(modifier = Modifier.weight(1f))
         }
 
         // Input field for sending messages
