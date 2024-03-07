@@ -2,6 +2,7 @@
 
 package com.example.edurescuedesigns
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,22 +16,21 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -74,7 +74,8 @@ fun RegisterForm(navController: NavController) {
         LastNameField(lastName.value) {lastName.value = it}
         RegisterEmailField(email.value) {email.value = it}
         RegisterPasswordField(password.value) {password.value = it}
-        DropDownUser(userSelection.value){userSelection.value = it}
+        DropDownUser()
+//        DropDownUser(userSelection.value){userSelection.value = it}
         IDField(studentID.value) {studentID.value = it}
         RegisterButton()
 
@@ -165,61 +166,90 @@ fun RegisterPasswordField(
         )
     )
 }
-
 @Composable
-fun DropDownUser(
-    userValue: String,
-    onUserValueChange: (String) -> Unit
-) {
-    val isExpanded = remember { mutableStateOf(false) }
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-    ) {
-        ExposedDropdownMenuBox(
-            expanded = isExpanded.value,
-            onExpandedChange = { isExpanded.value = it }
-        ) {
-            TextField(
-                value = userValue,
-                onValueChange = {onUserValueChange},
-                readOnly = true,
-                trailingIcon = {
-                    TrailingIcon(expanded = isExpanded.value)
-                },
-                colors = ExposedDropdownMenuDefaults.textFieldColors()
-            )
+fun DropDownUser() {
+    val context = LocalContext.current
+    var isExpanded = remember { mutableStateOf(false) }
 
-            ExposedDropdownMenu(
-                expanded = isExpanded.value,
-                onDismissRequest = { isExpanded.value = false }
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Admin") },
-                    onClick = {
-                        onUserValueChange("Admin")
-                        isExpanded.value = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("Teacher") },
-                    onClick = {
-                        onUserValueChange("Teacher")
-                        isExpanded.value = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("Student") },
-                    onClick = {
-                        onUserValueChange("Student")
-                        isExpanded.value = false
-                    }
-                )
-            }
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.TopEnd
+    ) {
+        IconButton(onClick = { isExpanded.value = !isExpanded.value }) {
+            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More")
         }
     }
+    DropdownMenu(
+        expanded = isExpanded.value,
+        onDismissRequest = { isExpanded.value = false })
+    {
+        DropdownMenuItem(
+            text = { Text("Admin") },
+            onClick = { Toast.makeText(context, "Admin", Toast.LENGTH_SHORT).show() })
+        DropdownMenuItem(
+            text = { Text("Teacher") },
+            onClick = { Toast.makeText(context, "Teacher", Toast.LENGTH_SHORT).show() })
+        DropdownMenuItem(
+            text = { Text("Student") },
+            onClick = { Toast.makeText(context, "Student", Toast.LENGTH_SHORT).show() })
+
+    }
 }
+
+//@Composable
+//fun DropDownUser(
+//    userValue: String,
+//    onUserValueChange: (String) -> Unit
+//) {
+//    val isExpanded = remember { mutableStateOf(false) }
+//    Box(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(8.dp),
+//    ) {
+//        ExposedDropdownMenuBox(
+//            expanded = isExpanded.value,
+//            onExpandedChange = { isExpanded.value = it }
+//        ) {
+//            TextField(
+//                value = userValue,
+//                onValueChange = {onUserValueChange},
+//                readOnly = true,
+//                trailingIcon = {
+//                    TrailingIcon(expanded = isExpanded.value)
+//                },
+//                colors = ExposedDropdownMenuDefaults.textFieldColors()
+//            )
+//
+//            ExposedDropdownMenu(
+//                expanded = isExpanded.value,
+//                onDismissRequest = { isExpanded.value = false }
+//            ) {
+//                DropdownMenuItem(
+//                    text = { Text("Admin") },
+//                    onClick = {
+//                        onUserValueChange("Admin")
+//                        isExpanded.value = false
+//                    }
+//                )
+//                DropdownMenuItem(
+//                    text = { Text("Teacher") },
+//                    onClick = {
+//                        onUserValueChange("Teacher")
+//                        isExpanded.value = false
+//                    }
+//                )
+//                DropdownMenuItem(
+//                    text = { Text("Student") },
+//                    onClick = {
+//                        onUserValueChange("Student")
+//                        isExpanded.value = false
+//                    }
+//                )
+//            }
+//        }
+//    }
+//}
 
 @Composable
 fun IDField(
