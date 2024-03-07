@@ -2,6 +2,7 @@ package com.example.edurescuedesigns.classes
 
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.example.edurescuedesigns.datatypes.ChatMessage
 import com.example.edurescuedesigns.datatypes.LoginResponse
 import com.example.edurescuedesigns.datatypes.User
 import com.google.gson.Gson
@@ -12,6 +13,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.IOException
 import java.io.StringReader
 import java.util.concurrent.CompletableFuture
@@ -112,6 +115,50 @@ class Network {
                     } else {
                         promise.complete(user)
                         Log.d("JUSTIN", responseBody)
+                    }
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e("JUSTIN", "Error: ${e.message}")
+                }
+            })
+        } catch (e: Exception) {
+            Log.e("JUSTIN", "Error: ${e.message}")
+        }
+
+        return promise
+    }
+
+    fun getChatRoomMessages(room:String): CompletableFuture<List<ChatMessage>>{
+        val promise = CompletableFuture<List<ChatMessage>>()
+        try {
+            val url = "http://10.0.2.2:8008/chatroom/messages/$room"
+            Log.d("GET MESSAGES", url)
+            val request = Request.Builder()
+                .url(url)
+                .build()
+
+            Client.newCall(request).enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    Log.d("GET MESSAGES", "In Response")
+                    if (response.isSuccessful) {
+                        Log.d("GET MESSAGES", "Sucesss")
+                        val responseData = response.body?.string()
+                        val jsonObject = JSONObject(responseData)
+                        val jsonMessages = jsonObject.getJSONArray("messages")
+                        val messages = mutableListOf<ChatMessage>()
+                        Log.d("GET MESSAGES", "Processing")
+                        for (i in 0 until jsonMessages.length()) {
+                            val jsonMessage = jsonMessages.getJSONObject(i)
+                            val gson = Gson()
+                            val message = gson.fromJson(StringReader(jsonMessage.toString()), ChatMessage::class.java)
+                            // Parse other properties of ChatMessage if necessary
+                            messages.add(message)
+
+                        }
+                        promise.complete(messages)
+                    } else {
+                        promise.completeExceptionally(Exception("Failed to fetch messages. Response code: ${response.code}"))
                     }
                 }
 

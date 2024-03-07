@@ -5,5 +5,8 @@ data class User(
     val lastName : String = "",
     val email : String = "",
     val id: Int = -1,
+    val enrollment: String = "",
+    val phone: String = "",
+    val profilepic: String = "",
     val validToken: Boolean = false
 )

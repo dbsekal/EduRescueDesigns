@@ -38,8 +38,11 @@ class SocketManager private constructor() {
             val jsonMessage = args[0] as JSONObject
             val sender = jsonMessage.optString("sender", "Unknown")
             val message = jsonMessage.getString("message")
-            val timestamp = System.currentTimeMillis() // Current timestamp
-            val chatMessage = ChatMessage(sender, message, timestamp)
+            val profilepic = jsonMessage.getString("profilepic")
+            val email = jsonMessage.getString("email")
+            val timestamp = jsonMessage.getLong("timestamp")
+
+            val chatMessage = ChatMessage(sender, message, timestamp, profilepic, email)
             runBlocking {
                 _messageFlow.emit(chatMessage)
             }
@@ -64,9 +67,19 @@ class SocketManager private constructor() {
             put("message", message)
             put("sender", "${user.firstName} ${user.lastName}")
             put("email", user.email)
+            put("profilepic", user.profilepic)
+            put("room", user.enrollment)
+            put("timestamp", System.currentTimeMillis())
             // Add other data as needed
         }
         socket.emit("message", jsonMessage)
+    }
+    fun joinRoom(user: User) {
+        val jsonMessage = JSONObject().apply {
+            put("username", "${user.firstName} ${user.lastName}")
+            put("room", user.enrollment)
+        }
+        socket.emit("joinRoom", jsonMessage)
     }
 
     fun disconnect() {

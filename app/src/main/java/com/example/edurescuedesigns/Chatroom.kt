@@ -7,19 +7,26 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.edurescuedesigns.datatypes.ChatMessage
 import com.example.edurescuedesigns.classes.Network
 import com.example.edurescuedesigns.classes.SocketManager
 import com.example.edurescuedesigns.datatypes.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
 
 
 
 @Composable
-fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance()) {
-    var user by remember { mutableStateOf(User()) }
+fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), navController: NavController) {
 
+    var chatMessages by remember { mutableStateOf(listOf<ChatMessage>()) }
+    var newMessage by remember { mutableStateOf("") }
+
+    var user by remember { mutableStateOf(User()) }
     //Ensures that the fetch request is only done iff user needs validation
     LaunchedEffect(Unit) {
         if (!user.validToken) {
@@ -28,11 +35,28 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance()) {
                 if (userRes.validToken) {
                     Log.d("Token RES", "valid")
                     user = userRes
+                    socketManager.joinRoom(user)
+
+                    Network().getChatRoomMessages(user.enrollment).thenAccept(){
+                            messages ->
+                        if(messages.isNotEmpty()){
+                            chatMessages = chatMessages + messages
+                        }
+                    }
+
                 } else {
                     Log.d("Token RES", "invalid")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        navController.navigate("login")
+                    }
                 }
             }
+
+
         }
+
+
+
     }
 
 /*TODO @Katelynn
@@ -42,8 +66,7 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance()) {
    Note: User data class can be found at User.kt. You need to login to intialize the user (will fix)
  */
 
-    var chatMessages by remember { mutableStateOf(listOf<ChatMessage>()) }
-    var newMessage by remember { mutableStateOf("") }
+
 
     //We listen for messages vie flow. Find the Flow in SocketManager.kt
     LaunchedEffect(Unit) {
