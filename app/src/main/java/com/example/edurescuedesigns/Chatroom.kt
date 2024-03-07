@@ -3,12 +3,16 @@ import android.util.Log
 import coil.compose.AsyncImage
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.edurescuedesigns.datatypes.ChatMessage
@@ -31,7 +35,6 @@ fun formatTime(timestamp: Long): String {
         e.toString()
     }
 }
-
 
 @Composable
 fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), navController: NavController) {
@@ -89,18 +92,22 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
         // Display chat messages
         Column(modifier = Modifier.weight(1f)) {
             for (chatMessage in chatMessages) {
-//                need to figure out how to display profile pic - Katelynn
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AsyncImage(
                         model = chatMessage.profilepic,
                         contentDescription = null,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier
+                            .clip(CircleShape)
                     )
                     Text("${chatMessage.sender} : ${chatMessage.message} (${formatTime(chatMessage.timestamp)})")
                 }
-                Spacer(modifier = Modifier.weight(1f))
+//                Spacer(modifier = Modifier.weight(1f))
             }
-
+            Spacer(modifier = Modifier.weight(1f))
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+            ) {
             // Input field for sending messages
             TextField(
                 value = newMessage,
@@ -122,8 +129,12 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
             ) {
                 Text("Send")
             }
+            }
         }
     }
 }
 
 
+//@Preview
+//@Composable
+//fun PreviewChatroom
