@@ -36,7 +36,14 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
                     Log.d("Token RES", "valid")
                     user = userRes
                     socketManager.joinRoom(user)
-                    Log.d("USER", user.toString())
+
+                    Network().getChatRoomMessages(user.enrollment).thenAccept(){
+                            messages ->
+                        if(messages.isNotEmpty()){
+                            chatMessages = chatMessages + messages
+                        }
+                    }
+
                 } else {
                     Log.d("Token RES", "invalid")
                     CoroutineScope(Dispatchers.Main).launch {
@@ -45,12 +52,7 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
                 }
             }
 
-            Network().getChatRoomMessages(user.enrollment).thenAccept(){
-                    messages ->
-                if(messages.isNotEmpty()){
-                    chatMessages = chatMessages + messages
-                }
-            }
+
         }
 
 

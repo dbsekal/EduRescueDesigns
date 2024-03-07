@@ -132,7 +132,7 @@ class Network {
     fun getChatRoomMessages(room:String): CompletableFuture<List<ChatMessage>>{
         val promise = CompletableFuture<List<ChatMessage>>()
         try {
-            val url = "http://10.0.2.2:8008/chatroom/messages/MabqUAzmDMPs1nsWYh3K"
+            val url = "http://10.0.2.2:8008/chatroom/messages/$room"
             Log.d("GET MESSAGES", url)
             val request = Request.Builder()
                 .url(url)
