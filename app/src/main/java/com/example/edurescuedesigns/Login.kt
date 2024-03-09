@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -48,6 +49,7 @@ import kotlinx.coroutines.launch
 fun LoginForm(navController: NavController) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
+    val message = remember { mutableStateOf("")}
 
     Box(modifier = Modifier.fillMaxSize()){
         Column (modifier = Modifier
@@ -79,8 +81,9 @@ fun LoginForm(navController: NavController) {
             color = Color(0xFF410001)
         )
         EmailField(email.value) { email.value = it }
-        PasswordField(email.value, password.value, { password.value = it },navController = navController)
-        LoginButton(email.value, password.value, navController)
+        PasswordField(email.value, password.value, { password.value = it }, navController = navController, message)
+        LoginButton(email.value, password.value, navController, message)
+        Text(message.value)
     }
 }
 
@@ -110,7 +113,8 @@ fun PasswordField(
     emailValue: String,
     passwordValue: String,
     onPasswordChange: (String) -> Unit,
-    navController: NavController
+    navController: NavController,
+    message: MutableState<String>
 ) {
     var showPassword = remember { mutableStateOf(value = false)}
 
@@ -130,7 +134,7 @@ fun PasswordField(
             imeAction = ImeAction.Done
         ),
         keyboardActions = KeyboardActions(
-            onDone = {submitLogin(emailValue,passwordValue, navController)}
+            onDone = {submitLogin(emailValue,passwordValue, navController, message)}
         ),
         trailingIcon = {
             if (showPassword.value) {
@@ -155,10 +159,11 @@ fun PasswordField(
     )
 }
 
-fun submitLogin(email: String, password: String,navController: NavController) {
+fun submitLogin(email: String, password: String,navController: NavController, message: MutableState<String>) {
 
     Network().login(email = email, password = password)
         .thenAccept{ response ->
+            message.value = response.message
             if (response.emailError) {
                 Log.d("LOGIN RES",response.message)
             } else if (response.passwordError){
@@ -174,8 +179,8 @@ fun submitLogin(email: String, password: String,navController: NavController) {
 }
 
 @Composable
-fun LoginButton(email: String, password: String,navController: NavController) {
-    Button(onClick = {submitLogin(email,password, navController)}) {
+fun LoginButton(email: String, password: String,navController: NavController, message: MutableState<String>) {
+    Button(onClick = {submitLogin(email,password, navController, message)}) {
         Text("Login")
     }
 }
