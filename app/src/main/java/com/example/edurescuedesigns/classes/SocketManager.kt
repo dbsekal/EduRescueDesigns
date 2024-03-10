@@ -11,6 +11,8 @@ import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.net.URISyntaxException
 
+//Socket manager is a class that handles the management of the sockets for the application's
+//Lobby system using Socket.io
 class SocketManager private constructor() {
 
     private val socket: Socket
@@ -61,6 +63,7 @@ class SocketManager private constructor() {
         }
     }
 
+    //Formats and sends message to backend to emit to all users
     fun sendMessage(message: String, user: User) {
         //Emits message to broadcast to entire server
         val jsonMessage = JSONObject().apply {
@@ -74,6 +77,7 @@ class SocketManager private constructor() {
         }
         socket.emit("message", jsonMessage)
     }
+    //Joins a room by the user's current class
     fun joinRoom(user: User) {
         val jsonMessage = JSONObject().apply {
             put("username", "${user.firstName} ${user.lastName}")
