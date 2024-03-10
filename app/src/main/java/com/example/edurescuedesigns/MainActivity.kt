@@ -68,26 +68,36 @@ class MainActivity : AppCompatActivity() {
 
 
         setContent {
-            val homeTab = TabBarItem(title = "Home", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home)
+            val homeTab = TabBarItem(title = "Homepage", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home)
             val chatroomTab = TabBarItem(title = "Chatroom", selectedIcon = Icons.Filled.ChatBubble, unselectedIcon = Icons.Outlined.ChatBubble)
             val mapTab = TabBarItem(title = "Map", selectedIcon = Icons.Filled.PinDrop, unselectedIcon = Icons.Outlined.PinDrop)
-            val rollcallTab = TabBarItem(title = "Roll Call", selectedIcon = Icons.Filled.Checklist, unselectedIcon = Icons.Outlined.Checklist)
-
-            val tabBarItems = listOf(homeTab, chatroomTab,mapTab,rollcallTab)
+            val rollcallTab = TabBarItem(title = "Rollcall", selectedIcon = Icons.Filled.Checklist, unselectedIcon = Icons.Outlined.Checklist)
+            val tabBarItemsStudent = listOf(homeTab, chatroomTab,mapTab)
+            val tabBarItemsProfessor = listOf(homeTab, chatroomTab,mapTab,rollcallTab)
+            var shouldShowBottomBar = rememberSaveable { mutableStateOf(false) }
+            var userIsStudent = rememberSaveable { mutableStateOf(true) }
 
             AppTheme {
                 val navController = rememberNavController()
-
                 Surface (
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ){
-                    Scaffold (bottomBar = {TabView(tabBarItems, navController)}){
+                    Scaffold (bottomBar = {
+                        if(shouldShowBottomBar.value) {
+                            if(userIsStudent.value){
+                                TabView(tabBarItemsStudent, navController)
+                            }else{
+                                TabView(tabBarItemsProfessor, navController)
+                            }
+
+                        }
+                        }){
                         NavHost(
                             navController = navController,
                             startDestination = startDestination){
                             composable(route="homepage"){
-                                HomePageForm(navController)}
+                                HomePageForm(navController,shouldShowBottomBar,userIsStudent)}
                             composable(route="login"){
                                 LoginForm(navController)
                             }
@@ -96,6 +106,12 @@ class MainActivity : AppCompatActivity() {
                             }
                             composable(route = "register"){
                                 RegisterForm(navController)
+                            }
+                            composable(route="map"){
+                                MapScreen(navController)
+                            }
+                            composable(route="rollcall"){
+                                Rollcall(navController)
                             }
 
                         }

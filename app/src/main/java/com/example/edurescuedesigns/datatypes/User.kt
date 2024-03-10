@@ -8,5 +8,6 @@ data class User(
     val enrollment: String = "",
     val phone: String = "",
     val profilepic: String = "",
-    val validToken: Boolean = false
+    val validToken: Boolean = false,
+    val type: String = "student"
 )
