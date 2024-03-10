@@ -96,5 +96,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences-core:1.0.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
 
+    //navigation bar
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
 
 }
