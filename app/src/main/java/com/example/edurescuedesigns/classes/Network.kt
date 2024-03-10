@@ -3,6 +3,7 @@ package com.example.edurescuedesigns.classes
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.edurescuedesigns.datatypes.ChatMessage
+import com.example.edurescuedesigns.datatypes.EmergencyPlan
 import com.example.edurescuedesigns.datatypes.LoginResponse
 import com.example.edurescuedesigns.datatypes.User
 import com.google.gson.Gson
@@ -94,6 +95,42 @@ class Network {
 
     //getUserInfo sends the backend a JWT token to both see if user is authorized and also
     //Returns that users info - Justin
+
+    fun getEmergencyPlan():CompletableFuture<EmergencyPlan>{
+        val promise = CompletableFuture<EmergencyPlan>()
+        val token = getToken();
+
+        try {
+            val url = "http://10.0.2.2:8008/emergencyplan/"
+            val request = Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer $token")
+                .build()
+            Client.newCall(request).enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    var responseBody = response.body!!.string()
+                    val gson = Gson()
+                    val emergencyPlan = gson.fromJson(StringReader(responseBody), EmergencyPlan::class.java)
+                    if (!response.isSuccessful) {
+                        promise.complete(emergencyPlan)
+                    } else {
+                        promise.complete(emergencyPlan)
+                        Log.d("EMERGENCY", responseBody)
+                    }
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e("JUSTIN", "Error: ${e.message}")
+                }
+            })
+        } catch (e: Exception) {
+            Log.e("JUSTIN", "Error: ${e.message}")
+        }
+        return promise
+    }
+
+
+
     fun getUserInfo(): CompletableFuture<User> {
         val promise = CompletableFuture<User>()
 
