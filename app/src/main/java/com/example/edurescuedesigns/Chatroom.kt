@@ -2,6 +2,8 @@ import android.icu.text.SimpleDateFormat
 import android.util.Log
 import coil.compose.AsyncImage
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -24,6 +27,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 
 
 fun formatTime(timestamp: Long): String {
@@ -41,7 +48,11 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
 
     var chatMessages by remember { mutableStateOf(listOf<ChatMessage>()) }
     var newMessage by remember { mutableStateOf("") }
+    // State variable to track whether email box should be shown
+    var showEmailBox by remember { mutableStateOf(false) }
 
+    // State variable to store the email of the clicked user
+    var clickedUserEmail by remember { mutableStateOf("") }
     var user by remember { mutableStateOf(User()) }
     //Ensures that the fetch request is only done iff user needs validation
     LaunchedEffect(Unit) {
@@ -73,12 +84,6 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
 
     }
 
-    /*TODO @Katelynn
-   1. Design this page
-   2. Take the user variable and make the messages display their name
-   3. Add a hover effect on the user's name to display email
-   Note: User data class can be found at User.kt. You need to login to intialize the user (will fix)
- */
 
 
     //We listen for messages vie flow. Find the Flow in SocketManager.kt
@@ -99,42 +104,92 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
                         modifier = Modifier
                             .clip(CircleShape)
                     )
-                    Text("${chatMessage.sender} : ${chatMessage.message} (${formatTime(chatMessage.timestamp)})")
+                    Text(
+                        text = "${chatMessage.sender} : ${chatMessage.message} (${formatTime(chatMessage.timestamp)})",
+                        modifier = Modifier.clickable {
+                            // Show the email box when the user's name is clicked
+                            showEmailBox = true
+                            clickedUserEmail = chatMessage.email
+                        }
+                    )
+//                    Text("${chatMessage.sender} : ${chatMessage.message} (${formatTime(chatMessage.timestamp)})")
                 }
-//                Spacer(modifier = Modifier.weight(1f))
+            }
+            if (showEmailBox) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .background(Color.White)
+                        .clickable {
+                            // Hide the email box when clicked
+                            showEmailBox = false
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Email: $clickedUserEmail")
+                }
             }
             Spacer(modifier = Modifier.weight(1f))
             Column(
                 modifier = Modifier
                     .padding(vertical = 16.dp)
             ) {
-            // Input field for sending messages
-            TextField(
-                value = newMessage,
-                onValueChange = { newMessage = it },
-                modifier = Modifier.padding(vertical = 16.dp),
-                label = { Text("Message") },
-                singleLine = true,
-            )
-
-            // Button to send messages
-            Button(
-                onClick = {
-                    if (newMessage.isNotEmpty()) {
-                        socketManager.sendMessage(newMessage, user)
-                        newMessage = ""
+                // Input field for sending messages
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    TextField(
+                        value = newMessage,
+                        onValueChange = { newMessage = it },
+                        modifier = Modifier.weight(1f).padding(vertical = 16.dp),
+                        label = { Text("Message") },
+                        singleLine = true,
+                    )
+                    // Button to send messages
+                    IconButton(
+                        onClick = {
+                            if (newMessage.isNotEmpty()) {
+                                socketManager.sendMessage(newMessage, user)
+                                newMessage = ""
+                            }
+                        },
+                    ) {
+                        Icon (
+                            imageVector = Icons.Filled.Send,
+                            contentDescription = "send_message"
+                        )
                     }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Send")
+                }
             }
-            }
+//            Spacer(modifier = Modifier.weight(1f))
+//            Column(
+//                modifier = Modifier
+//                    .padding(vertical = 16.dp)
+//            ) {
+//            // Input field for sending messages
+//            TextField(
+//                value = newMessage,
+//                onValueChange = { newMessage = it },
+//                modifier = Modifier.padding(vertical = 16.dp),
+//                label = { Text("Message") },
+//                singleLine = true,
+//            )
+//
+//                // Button to send messages
+//                IconButton(
+//                    onClick = {
+//                        if (newMessage.isNotEmpty()) {
+//                            socketManager.sendMessage(newMessage, user)
+//                            newMessage = ""
+//                        }
+//                    },
+//                ) {
+//                    Icon (
+//                        imageVector = Icons.Filled.Send,
+//                        contentDescription = "send_message"
+//                    )
+//                }
+//            }
         }
     }
 }
 
-
-//@Preview
-//@Composable
-//fun PreviewChatroom
