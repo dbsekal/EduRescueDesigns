@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -85,7 +86,6 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
     }
 
 
-
     //We listen for messages vie flow. Find the Flow in SocketManager.kt
     LaunchedEffect(Unit) {
         socketManager.messageFlow.collect { chatMessage ->
@@ -105,7 +105,11 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
                             .clip(CircleShape)
                     )
                     Text(
-                        text = "${chatMessage.sender} : ${chatMessage.message} (${formatTime(chatMessage.timestamp)})",
+                        text = "${chatMessage.sender} : ${chatMessage.message} (${
+                            formatTime(
+                                chatMessage.timestamp
+                            )
+                        })",
                         modifier = Modifier.clickable {
                             // Show the email box when the user's name is clicked
                             showEmailBox = true
@@ -136,7 +140,10 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
                     .padding(vertical = 16.dp)
             ) {
                 // Input field for sending messages
-                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     TextField(
                         value = newMessage,
                         onValueChange = { newMessage = it },
@@ -153,43 +160,14 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
                             }
                         },
                     ) {
-                        Icon (
-                            imageVector = Icons.Filled.Send,
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Send,
                             contentDescription = "send_message"
                         )
                     }
                 }
             }
-//            Spacer(modifier = Modifier.weight(1f))
-//            Column(
-//                modifier = Modifier
-//                    .padding(vertical = 16.dp)
-//            ) {
-//            // Input field for sending messages
-//            TextField(
-//                value = newMessage,
-//                onValueChange = { newMessage = it },
-//                modifier = Modifier.padding(vertical = 16.dp),
-//                label = { Text("Message") },
-//                singleLine = true,
-//            )
-//
-//                // Button to send messages
-//                IconButton(
-//                    onClick = {
-//                        if (newMessage.isNotEmpty()) {
-//                            socketManager.sendMessage(newMessage, user)
-//                            newMessage = ""
-//                        }
-//                    },
-//                ) {
-//                    Icon (
-//                        imageVector = Icons.Filled.Send,
-//                        contentDescription = "send_message"
-//                    )
-//                }
-//            }
+
         }
     }
 }
-
