@@ -1,9 +1,35 @@
 package com.example.edurescuedesigns
 import ChatRoomScreen
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChatBubble
+import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PinDrop
+import androidx.compose.material.icons.outlined.ChatBubble
+import androidx.compose.material.icons.outlined.Checklist
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.PinDrop
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -12,13 +38,19 @@ import com.example.edurescuedesigns.classes.Network
 import com.example.edurescuedesigns.ui.theme.AppTheme
 
 
+data class TabBarItem(
+    val title: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
+    val badgeAmount: Int? = null
+)
 class MainActivity : AppCompatActivity() {
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ContextSingleton.initialize(this)
         //REMOVE THIS LINE TO SAVE LOGIN DATA
-
-//       Network().removeToken()
+        Network().removeToken()
 
         //Check if user is already logged in
         var startDestination:String = "login"
@@ -35,29 +67,115 @@ class MainActivity : AppCompatActivity() {
 
 
         setContent {
+            val homeTab = TabBarItem(title = "Homepage", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home)
+            val chatroomTab = TabBarItem(title = "Chatroom", selectedIcon = Icons.Filled.ChatBubble, unselectedIcon = Icons.Outlined.ChatBubble)
+            val mapTab = TabBarItem(title = "Map", selectedIcon = Icons.Filled.PinDrop, unselectedIcon = Icons.Outlined.PinDrop)
+            val rollcallTab = TabBarItem(title = "Rollcall", selectedIcon = Icons.Filled.Checklist, unselectedIcon = Icons.Outlined.Checklist)
+            val tabBarItemsStudent = listOf(homeTab, chatroomTab,mapTab)
+            val tabBarItemsProfessor = listOf(homeTab, chatroomTab,mapTab,rollcallTab)
+            var shouldShowBottomBar = rememberSaveable { mutableStateOf(false) }
+            var userIsStudent = rememberSaveable { mutableStateOf(true) }
+
             AppTheme {
                 val navController = rememberNavController()
+                Surface (
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ){
+                    Scaffold (bottomBar = {
+                        if(shouldShowBottomBar.value) {
+                            if(userIsStudent.value){
+                                TabView(tabBarItemsStudent, navController)
+                            }else{
+                                TabView(tabBarItemsProfessor, navController)
+                            }
 
-                NavHost(
-                    navController = navController,
-                    startDestination = startDestination){
-                    composable(route="login"){
-                        LoginForm(navController)
+                        }
+                        }){
+                        NavHost(
+                            navController = navController,
+                            startDestination = startDestination){
+                            composable(route="homepage"){
+                                HomePageForm(navController,shouldShowBottomBar,userIsStudent)}
+                            composable(route="login"){
+                                LoginForm(navController)
+                            }
+                            composable(route="chatroom"){
+                                ChatRoomScreen(navController = navController)
+                            }
+                            composable(route = "register"){
+                                RegisterForm(navController)
+                            }
+                            composable(route="map"){
+                                MapScreen(navController)
+                            }
+                            composable(route="rollcall"){
+                                Rollcall(navController)
+                            }
+
+                        }
+
                     }
-                    composable(route="chatroom"){
-                        ChatRoomScreen(navController = navController)
+
                     }
-                    composable(route = "register"){
-                        RegisterForm(navController)
-                    }
-                    composable(route="homepage"){
-                        HomePageForm(navController)
-                    }
-                }
+
+
             }
+        }
+    }
+}
+
+@Composable
+fun TabView(tabBarItems: List<TabBarItem>, navController: NavController){
+    var selectedTabIndex = rememberSaveable {
+        mutableStateOf(0)
+    }
+
+    NavigationBar {
+        tabBarItems.forEachIndexed{ index, tabBarItem ->
+            NavigationBarItem(selected = selectedTabIndex.value == index,
+                onClick = {
+                    selectedTabIndex.value = index
+                    navController.navigate(tabBarItem.title)
+                },
+                icon = {
+                    TabBarIconView(
+                        isSelected = selectedTabIndex.value == index,
+                        selectedIcon = tabBarItem.selectedIcon,
+                        unselectedIcon = tabBarItem.unselectedIcon,
+                        title = tabBarItem.title,
+                        badgeAmount = tabBarItem.badgeAmount
+                    )
+                },
+                label = {Text(tabBarItem.title)}
+            )
         }
     }
 }
 
 
 
+@Composable
+fun TabBarIconView(
+    isSelected: Boolean,
+    selectedIcon: ImageVector,
+    unselectedIcon: ImageVector,
+    title: String,
+    badgeAmount: Int? = null
+){
+    BadgedBox(badge = {TabBarBadgeView(badgeAmount)}) {
+        Icon(
+            imageVector = if (isSelected) {selectedIcon} else {unselectedIcon},
+            contentDescription = title
+        )
+    }
+}
+
+@Composable
+fun TabBarBadgeView(count: Int? = null){
+    if (count != null){
+        Badge{
+            Text(count.toString())
+        }
+    }
+}
