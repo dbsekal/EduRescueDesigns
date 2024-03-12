@@ -101,7 +101,9 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
             .fillMaxSize()
             .verticalScroll(state = scrollState)
     ) {
-        // Display chat messages
+        Column(modifier = Modifier
+            .padding(16.dp)) {
+            // Display chat messages
             for (chatMessage in chatMessages) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AsyncImage(
@@ -173,6 +175,6 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
                     }
                 }
             }
-
+        }
     }
 }
