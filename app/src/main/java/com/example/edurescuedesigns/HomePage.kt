@@ -7,6 +7,8 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -21,8 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.edurescuedesigns.classes.Network
 import com.example.edurescuedesigns.datatypes.EmergencyPlan
 import com.example.edurescuedesigns.datatypes.User
@@ -65,7 +69,7 @@ fun HomePageForm(navController:NavController,shouldShowBottomBar: MutableState<B
                 if(emergencyPlanRes.is_active){
                     emergencyString = emergencyPlanRes.instructions
                 }else{
-                    emergencyString = "No Emergency"
+                    emergencyString = "There is no emergency."
                 }
 
             }
@@ -75,7 +79,9 @@ fun HomePageForm(navController:NavController,shouldShowBottomBar: MutableState<B
 
     }
     topBar()
-    Text(emergencyString)
+    Box( modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+        Text(text = emergencyString, fontSize = 40.sp, textAlign = TextAlign.Center)
+    }
 
 }
 
@@ -96,5 +102,26 @@ fun topBar(){
         }
 
 
+
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewHomePage() {
+    MaterialTheme {
+        // Use a dummy NavController for preview purposes
+        val navController = rememberNavController()
+        // Create dummy MutableState<Boolean> for shouldShowBottomBar and userIsStudent
+        val shouldShowBottomBar = remember { mutableStateOf(true) }
+        val userIsStudent = remember { mutableStateOf(true) }
+
+        Surface {
+            HomePageForm(
+                navController = navController,
+                shouldShowBottomBar = shouldShowBottomBar,
+                userIsStudent = userIsStudent
+            )
+        }
+    }
 }
