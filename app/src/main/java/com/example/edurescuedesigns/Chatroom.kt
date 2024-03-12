@@ -5,8 +5,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -92,10 +94,14 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
             chatMessages = chatMessages + chatMessage
         }
     }
-
-    Column(modifier = Modifier.padding(16.dp)) {
+    val scrollState = rememberScrollState()
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxSize()
+            .verticalScroll(state = scrollState)
+    ) {
         // Display chat messages
-        Column(modifier = Modifier.weight(1f)) {
             for (chatMessage in chatMessages) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AsyncImage(
@@ -168,6 +174,5 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
                 }
             }
 
-        }
     }
 }
