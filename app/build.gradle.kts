@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+
 }
 
 android {
@@ -43,6 +45,9 @@ android {
 }
 
 dependencies {
+    //Maps
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+
     //chatroom
     implementation("io.coil-kt:coil-compose:2.6.0")
 
