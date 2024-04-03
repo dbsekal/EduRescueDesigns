@@ -104,5 +104,8 @@ dependencies {
     //navigation bar
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
+    //accompanist
+    implementation("com.google.accompanist:accompanist-permissions:0.30.1")
+
 
 }
