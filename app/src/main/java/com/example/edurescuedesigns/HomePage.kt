@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -78,7 +79,7 @@ fun HomePageForm(navController:NavController,shouldShowBottomBar: MutableState<B
         }
 
     }
-    topBar()
+    topBar(navController = navController)
     Box( modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
         Text(text = emergencyString, fontSize = 40.sp, textAlign = TextAlign.Center)
     }
@@ -87,15 +88,22 @@ fun HomePageForm(navController:NavController,shouldShowBottomBar: MutableState<B
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun topBar(){
+fun topBar(navController:NavController){
     TopAppBar(
+        navigationIcon = {
+                         IconButton(onClick = {navController.navigate("settings") }) {
+                             Icon(Icons.Filled.Settings, contentDescription = "Settings")
+
+                         }
+        },
+
         title = {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
                 Text(text ="EduRescue", color = Color(0xFF930005), fontSize = 25.sp, fontFamily = FontFamily.Default, textAlign = TextAlign.Center)
             }
         },
         actions = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { navController.navigate("profile") }) {
                 Icon(Icons.Filled.AccountCircle, contentDescription = "User Profile")
 
             }

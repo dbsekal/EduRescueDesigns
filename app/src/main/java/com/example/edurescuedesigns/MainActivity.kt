@@ -114,6 +114,12 @@ class MainActivity : AppCompatActivity() {
                             composable(route="rollcall"){
                                 Rollcall(navController)
                             }
+                            composable(route="profile"){
+                                Profile(navController)
+                            }
+                            composable(route ="settings"){
+                                Settings(navController)
+                            }
 
                         }
 
