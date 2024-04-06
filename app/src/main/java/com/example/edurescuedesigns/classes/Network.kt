@@ -71,6 +71,11 @@ class Network {
     }
     /*TODO- Create a register function that hits our API*/
 
+    fun updateUser(user:User){
+        //TODO UPDATE USER
+        return
+    }
+
 
     fun setToken(token:String){
         val editor = sharedpref.edit()
