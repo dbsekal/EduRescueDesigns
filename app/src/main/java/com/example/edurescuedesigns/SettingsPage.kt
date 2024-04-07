@@ -23,8 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.Switch
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
@@ -33,76 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.preference.PreferenceManager
 import com.example.edurescuedesigns.ui.theme.*
-import com.google.android.material.color.utilities.DynamicColor
 
-
-//@Composable
-//fun Settings(navController: NavController){
-////    Text("Settings page")
-//    var notificationsEnabled by remember { mutableStateOf(true) }
-//    val isDarkModeInitialValue = isSystemInDarkTheme()
-//    val isDarkMode = remember { mutableStateOf(isDarkModeInitialValue) }
-//
-//    // Function to toggle notifications
-//    val toggleNotifications: (Boolean) -> Unit = { enabled ->
-//        notificationsEnabled = enabled
-//        // Perform any other actions when toggling notifications
-//    }
-//
-//    val toggleDarkMode: (Boolean) -> Unit = { enabled ->
-//        isDarkMode.value = enabled
-//        AppTheme(
-//            darkTheme = isDarkMode.value,
-//            dynamicColor = DynamicColor,
-//            content = {}
-//        )
-//    }
-//
-//
-//    // UI for the settings page
-//    Column(
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        modifier = Modifier.fillMaxWidth()
-//    ) {
-//        Spacer(modifier = Modifier.height(16.dp))
-//        Text("Settings", fontSize = 30.sp)
-//        // Toggle for notifications
-//        Row(verticalAlignment = Alignment.CenterVertically) {
-//            Text("Notifications")
-//            Spacer(modifier = Modifier.weight(1f))
-//            Switch(
-//                checked = notificationsEnabled,
-//                onCheckedChange = toggleNotifications,
-//                modifier = Modifier.size(10.dp)
-//            )
-//        }
-//        HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
-//        Row(verticalAlignment = Alignment.CenterVertically) {
-//            Text("Dark Mode")
-//            Spacer(modifier = Modifier.weight(1f))
-//            Switch(
-//                checked = isDarkMode.value,
-//                onCheckedChange = toggleDarkMode,
-//                modifier = Modifier.size(10.dp)
-//            )
-//        }
-//    }
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview(){
-//    Settings(navController = rememberNavController())
-//}
-
-//@Composable
-//fun saveThemePreference(isDarkTheme: Boolean) {
-//    if (isDarkTheme) {
-//        PreferenceManager.getDefaultSharedPreferences(LocalContext.current.applicationContext).edit().putString(THEME_PREFS_KEY, "dark").apply()
-//    } else {
-//        PreferenceManager.getDefaultSharedPreferences(LocalContext.current.applicationContext).edit().putString(THEME_PREFS_KEY, "light").apply()
-//    }
-//}
 
 @Composable
 fun Settings(navController: NavController) {
