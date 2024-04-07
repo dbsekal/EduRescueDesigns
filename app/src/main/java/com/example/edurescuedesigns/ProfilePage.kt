@@ -223,8 +223,8 @@ fun ProfileImage(imageUri: MutableState<String>) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview(){
-    Profile(navController = rememberNavController())
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun DefaultPreview(){
+//    Profile(navController = rememberNavController())
+//}
