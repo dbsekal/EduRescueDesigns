@@ -105,7 +105,7 @@ class Network {
         val token = getToken();
 
         try {
-            val url = "http://10.0.2.2:8008/emergencyplan/"
+            val url = "http://10.0.2.2:8008/emergencyplan/user"
             val request = Request.Builder()
                 .url(url)
                 .header("Authorization", "Bearer $token")
