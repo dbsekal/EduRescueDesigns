@@ -81,7 +81,7 @@ class Network {
         val editor = sharedpref.edit()
         editor.putString("token", token).apply()
     }
-    fun getToken():String{
+    fun getUserToken():String{
         val token = sharedpref.getString("token", null)
         if(token != null) {
             Log.d("TOKEN VAL: ", token)
@@ -102,7 +102,7 @@ class Network {
 
     fun getEmergencyPlan():CompletableFuture<EmergencyPlan>{
         val promise = CompletableFuture<EmergencyPlan>()
-        val token = getToken();
+        val token = getUserToken();
 
         try {
             val url = "http://10.0.2.2:8008/emergencyplan/user"
@@ -113,6 +113,7 @@ class Network {
             Client.newCall(request).enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
                     var responseBody = response.body!!.string()
+                    Log.d("emergency2", responseBody)
                     val gson = Gson()
                     val emergencyPlan = gson.fromJson(StringReader(responseBody), EmergencyPlan::class.java)
                     if (!response.isSuccessful) {
@@ -138,7 +139,7 @@ class Network {
     fun getUserInfo(): CompletableFuture<User> {
         val promise = CompletableFuture<User>()
 
-        val token = getToken()
+        val token = getUserToken()
 
         try {
             val url = "http://10.0.2.2:8008/account/getinfo"

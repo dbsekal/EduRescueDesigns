@@ -55,7 +55,6 @@ fun HomePageForm(navController:NavController,shouldShowBottomBar: MutableState<B
                     }
 
                     shouldShowBottomBar.value = true
-
                 } else {
                     Log.d("Token RES", "invalid")
                     CoroutineScope(Dispatchers.Main).launch {
@@ -89,6 +88,7 @@ fun HomePageForm(navController:NavController,shouldShowBottomBar: MutableState<B
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun topBar(navController:NavController){
+
     TopAppBar(
         navigationIcon = {
                          IconButton(onClick = {navController.navigate("settings") }) {

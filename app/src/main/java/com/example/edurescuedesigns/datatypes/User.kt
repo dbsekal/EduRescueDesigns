@@ -1,6 +1,7 @@
 package com.example.edurescuedesigns.datatypes
 
 data class User(
+    val docId: String = "",
     val firstName : String = "",
     val lastName : String = "",
     val email : String = "",
