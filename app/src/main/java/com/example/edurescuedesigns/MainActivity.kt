@@ -1,5 +1,6 @@
 package com.example.edurescuedesigns
 import ChatRoomScreen
+import MapScreen
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
@@ -36,7 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.edurescuedesigns.classes.ContextSingleton
 import com.example.edurescuedesigns.classes.Network
 import com.example.edurescuedesigns.ui.theme.AppTheme
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
+
 
 
 data class TabBarItem(
@@ -46,13 +47,13 @@ data class TabBarItem(
     val badgeAmount: Int? = null
 )
 class MainActivity : AppCompatActivity() {
-    @OptIn(ExperimentalPermissionsApi::class)
+    //@OptIn(ExperimentalPermissionsApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ContextSingleton.initialize(this)
         //REMOVE THIS LINE TO SAVE LOGIN DATA
-        Network().removeToken()
+        //Network().removeToken()
 
         //Check if user is already logged in
         var startDestination:String = "login"
@@ -109,7 +110,7 @@ class MainActivity : AppCompatActivity() {
                                 RegisterForm(navController)
                             }
                             composable(route="map"){
-                                MapScreen(navController)
+                                MapScreen()
                             }
                             composable(route="rollcall"){
                                 Rollcall(navController)
