@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -8,13 +10,30 @@ plugins {
 android {
     namespace = "com.example.edurescuedesigns"
     compileSdk = 34
-
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
     defaultConfig {
         applicationId = "com.example.edurescuedesigns"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+
+        //return empty key in case something goes wrong
+        val properties = Properties()
+        val keystoreFile = project.rootProject.file("api.properties")
+
+        properties.load(keystoreFile.inputStream())
+
+        val routesKey = properties.getProperty("ROUTES_KEY") ?: ""
+        buildConfigField(
+            type = "String",
+            name = "ROUTES_KEY",
+            value = "\"${routesKey}\""
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -26,11 +45,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
         }
     }
-    buildFeatures {
-        compose = true
-    }
+
 
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.9"
@@ -46,8 +64,10 @@ android {
 
 dependencies {
     //Maps
+    //noinspection GradleCompatible
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.maps.android:maps-compose:2.5.0")
+    implementation("com.google.maps.android:android-maps-utils:2.2.0")
     //chatroom
     implementation("io.coil-kt:coil-compose:2.6.0")
 
@@ -58,7 +78,10 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    //noinspection GradleCompatible
     implementation("com.google.android.gms:play-services-location:21.2.0")
+    //noinspection GradleCompatible
+    implementation("com.google.firebase:firebase-crashlytics-buildtools:2.9.9")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
