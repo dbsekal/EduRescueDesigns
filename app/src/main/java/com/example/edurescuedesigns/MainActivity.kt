@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ContextSingleton.initialize(this)
         //REMOVE THIS LINE TO SAVE LOGIN DATA
-        //Network().removeToken()
+        Network().removeToken()
 
         //Check if user is already logged in
         var startDestination:String = "login"
