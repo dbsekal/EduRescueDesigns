@@ -31,9 +31,9 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.ui.platform.LocalConfiguration
 
 
 fun formatTime(timestamp: Long): String {
@@ -95,14 +95,20 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
         }
     }
     val scrollState = rememberScrollState()
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val spacerHeight = (screenHeight * 0.70f).value.toInt()
+
     Column(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
-            .verticalScroll(state = scrollState)
     ) {
         Column(modifier = Modifier
-            .padding(16.dp)) {
+            .padding(16.dp)
+            .verticalScroll(state = scrollState)
+            .height(spacerHeight.dp)
+//            .background(color = Color.Blue)
+        ) {
             // Display chat messages
             for (chatMessage in chatMessages) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -142,39 +148,37 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
                     Text("Email: $clickedUserEmail")
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
-            Column(
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-            ) {
-                // Input field for sending messages
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextField(
-                        value = newMessage,
-                        onValueChange = { newMessage = it },
-                        modifier = Modifier.weight(1f).padding(vertical = 16.dp),
-                        label = { Text("Message") },
-                        singleLine = true,
-                    )
-                    // Button to send messages
-                    IconButton(
-                        onClick = {
-                            if (newMessage.isNotEmpty()) {
-                                socketManager.sendMessage(newMessage, user)
-                                newMessage = ""
-                            }
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "send_message"
-                        )
+        }
+        // Input field for sending message
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            TextField(
+                value = newMessage,
+                onValueChange = { newMessage = it },
+                modifier = Modifier.weight(1f).padding(vertical = 16.dp),
+                label = { Text("Message") },
+                singleLine = true,
+            )
+            // Button to send messages
+            IconButton(
+                onClick = {
+                    if (newMessage.isNotEmpty()) {
+                        socketManager.sendMessage(newMessage, user)
+                        newMessage = ""
                     }
-                }
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    contentDescription = "send_message"
+                )
             }
         }
+
     }
 }

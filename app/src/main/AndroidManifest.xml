@@ -22,7 +22,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_KEY}"/>
         <activity
-            android:windowSoftInputMode="adjustResize"
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

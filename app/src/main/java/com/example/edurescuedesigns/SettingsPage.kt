@@ -31,21 +31,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.preference.PreferenceManager
 import com.example.edurescuedesigns.ui.theme.*
+//import android.content.SharedPreferences
 
 
 @Composable
 fun Settings(navController: NavController) {
-    var notificationsEnabled by rememberSaveable { mutableStateOf(true) }
+    // Save user's preferences after navigating to a different page in app
+    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LocalContext.current)
+    var notificationsEnabled by remember { mutableStateOf(sharedPreferences.getBoolean("notifications", true)) }
     val isDarkModeInitialValue = isSystemInDarkTheme()
-    var isDarkMode by rememberSaveable { mutableStateOf(isDarkModeInitialValue) }
+    var isDarkMode by remember { mutableStateOf(sharedPreferences.getBoolean("darkMode", isDarkModeInitialValue)) }
+
+    // Save pref to SharedPreferences
+    fun savePreferences() {
+        with(sharedPreferences.edit()) {
+            putBoolean("notifications", notificationsEnabled)
+            putBoolean("darkMode", isDarkMode)
+            apply()
+        }
+    }
 
     val toggleNotifications: (Boolean) -> Unit = { enabled ->
         notificationsEnabled = enabled
-        // Perform any other actions when toggling notifications
+        savePreferences()
     }
 
     val toggleDarkMode: (Boolean) -> Unit = { enabled ->
         isDarkMode = enabled
+        savePreferences()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubble
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ContextSingleton.initialize(this)
         //REMOVE THIS LINE TO SAVE LOGIN DATA
-        //Network().removeToken()
+//        Network().removeToken()
 
         //Check if user is already logged in
         var startDestination:String = "login"
@@ -86,7 +87,8 @@ class MainActivity : AppCompatActivity() {
                     color = MaterialTheme.colorScheme.background
                 ){
                     Scaffold (bottomBar = {
-                        if(shouldShowBottomBar.value) {
+                        // Do not show bottom bar on login page
+                        if(shouldShowBottomBar.value && navController.currentBackStackEntry?.destination?.route != "login") {
                             if(userIsStudent.value){
                                 TabView(tabBarItemsStudent, navController)
                             }else{
