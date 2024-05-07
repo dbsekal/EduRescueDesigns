@@ -74,9 +74,9 @@ dependencies {
     //HTTP
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.core:core-ktx:1.13.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     //noinspection GradleCompatible
     implementation("com.google.android.gms:play-services-location:21.2.0")
@@ -111,7 +111,7 @@ dependencies {
     implementation("androidx.compose.material3:material3-window-size-class")
 
     // Optional - Integration with activities
-    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.activity:activity-compose:1.9.0")
     // Optional - Integration with ViewModels
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     // Optional - Integration with LiveData
@@ -121,8 +121,8 @@ dependencies {
     implementation("io.socket:socket.io-client:2.0.0")
     implementation ("org.jetbrains.kotlin:kotlin-script-runtime:1.9.22")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("com.google.code.gson:gson:2.10")
-    implementation("androidx.datastore:datastore-preferences-core:1.0.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("androidx.datastore:datastore-preferences-core:1.1.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
 
     //navigation bar
@@ -133,6 +133,9 @@ dependencies {
 
     //profile pic
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    implementation ("androidx.compose.runtime:runtime:1.6.6") // or another compatible version
+
 
 
 }
