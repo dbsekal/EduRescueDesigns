@@ -1,5 +1,3 @@
-
-
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -217,7 +215,7 @@ fun MapScreen() {
 
         }
     }
-    //Pops up dialog for when student is outside radius
+    // Megan - Pops up dialog for when student is outside radius
     var showDialog by remember { mutableStateOf(false) }
 
 
@@ -291,10 +289,10 @@ fun MapScreen() {
                     updateCurrentLocation()
                     fetchProfInfo()
                     CoroutineScope(Dispatchers.Main).launch {
-                        delay(150) // Adjust the delay time as needed
+                        delay(150) 
                         if(directionsActive){
                             calculateRoute(currentLocation, rendezvousLocation)
-                        }else{
+                        } else{
                             cameraPositionState.position = CameraPosition.Builder()
                                 .target(currentLocation)
                                 .zoom(17f)
@@ -308,7 +306,7 @@ fun MapScreen() {
             ) {
                 Text(text = "Refresh", color = if (isWithinCSULB) Color.White else Color.Gray)
             }
-            //Shows dialog IFF user is outside of radius
+            //Megan - Shows message if user is outside of radius/not on campus
             if (showDialog) {
                 AlertDialog(
                     onDismissRequest = { showDialog = false },
