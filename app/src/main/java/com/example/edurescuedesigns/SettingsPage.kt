@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.preference.PreferenceManager
 import com.example.edurescuedesigns.ui.theme.*
-//import android.content.SharedPreferences
+
 
 
 @Composable
@@ -100,6 +100,15 @@ fun Settings(navController: NavController) {
                             onCheckedChange = toggleDarkMode,
                             modifier = Modifier.size(10.dp)
                         )
+                    }
+                    HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .padding(end = 30.dp)) {
+                        Text("Languages")
+                        Spacer(modifier = Modifier.weight(0.5f))
                     }
                 }
             }
