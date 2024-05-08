@@ -100,85 +100,97 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
 
     Column(
         modifier = Modifier
-            .padding(16.dp)
             .fillMaxSize()
-    ) {
-        Column(modifier = Modifier
             .padding(16.dp)
-            .verticalScroll(state = scrollState)
-            .height(spacerHeight.dp)
+    ) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f),
+            contentAlignment = Alignment.TopStart
+//            .padding(16.dp)
+//            .verticalScroll(state = scrollState)
+//            .height(spacerHeight.dp)
 //            .background(color = Color.Blue)
         ) {
             // Display chat messages
-            for (chatMessage in chatMessages) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    AsyncImage(
-                        model = chatMessage.profilepic,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                    )
-                    Text(
-                        text = "${chatMessage.sender} : ${chatMessage.message} (${
-                            formatTime(
-                                chatMessage.timestamp
-                            )
-                        })",
-                        modifier = Modifier.clickable {
-                            // Show the email box when the user's name is clicked
-                            showEmailBox = true
-                            clickedUserEmail = chatMessage.email
-                        }
-                    )
-//                    Text("${chatMessage.sender} : ${chatMessage.message} (${formatTime(chatMessage.timestamp)})")
-                }
-            }
-            if (showEmailBox) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .background(Color.White)
-                        .clickable {
-                            // Hide the email box when clicked
-                            showEmailBox = false
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Email: $clickedUserEmail")
-                }
-            }
-        }
-        // Input field for sending message
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            TextField(
-                value = newMessage,
-                onValueChange = { newMessage = it },
-                modifier = Modifier.weight(1f).padding(vertical = 16.dp),
-                label = { Text("Message") },
-                singleLine = true,
-            )
-            // Button to send messages
-            IconButton(
-                onClick = {
-                    if (newMessage.isNotEmpty()) {
-                        socketManager.sendMessage(newMessage, user)
-                        newMessage = ""
-                    }
-                },
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .verticalScroll(state = scrollState)
+//                    .background(color = Color.Blue)
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "send_message"
+                for (chatMessage in chatMessages) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        AsyncImage(
+                            model = chatMessage.profilepic,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                        )
+                        Text(
+                            text = "${chatMessage.sender} : ${chatMessage.message} (${
+                                formatTime(
+                                    chatMessage.timestamp
+                                )
+                            })",
+                            modifier = Modifier.clickable {
+                                // Show the email box when the user's name is clicked
+                                showEmailBox = true
+                                clickedUserEmail = chatMessage.email
+                            }
+                        )
+                    }
+                }
+                if (showEmailBox) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .background(Color.Blue)
+                            .clickable {
+                                // Hide the email box when clicked
+                                showEmailBox = false
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Email: $clickedUserEmail")
+                    }
+                }
+
+            }
+
+        }
+        Box{
+            // Input field for sending message
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+            ) {
+                TextField(
+                    value = newMessage,
+                    onValueChange = { newMessage = it },
+                    modifier = Modifier.padding(start=10.dp, end=16.dp),
+                    label = { Text("Message") },
+                    singleLine = true,
                 )
+                // Button to send messages
+                IconButton(
+                    onClick = {
+                        if (newMessage.isNotEmpty()) {
+                            socketManager.sendMessage(newMessage, user)
+                            newMessage = ""
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = "send_message"
+                    )
+                }
             }
         }
+        Spacer(modifier = Modifier.weight(0.12f))
 
     }
 }
