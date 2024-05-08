@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.edurescuedesigns.datatypes.ChatMessage
 import com.example.edurescuedesigns.datatypes.EmergencyPlan
 import com.example.edurescuedesigns.datatypes.LoginResponse
+import com.example.edurescuedesigns.datatypes.ProfessorData
 import com.example.edurescuedesigns.datatypes.User
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
@@ -170,40 +172,28 @@ class Network {
 
         return promise
     }
+    //Sets professor Location in database hitting our API - Justin
+    fun setProfessorMarker(coordinates:LatLng){
+        val json = """
+            {
+                "coordinates": {
+                "lat": "${coordinates.latitude}",
+                "long": "${coordinates.longitude}"
+                }
+            }"""
+        val token = getUserToken()
 
-    fun getChatRoomMessages(room:String): CompletableFuture<List<ChatMessage>>{
-        val promise = CompletableFuture<List<ChatMessage>>()
         try {
-            val url = "http://10.0.2.2:8008/chatroom/messages/$room"
-            Log.d("GET MESSAGES", url)
+            val url = "http://10.0.2.2:8008/account/setProfessorLocation"
             val request = Request.Builder()
                 .url(url)
+                .put(json.toRequestBody("application/json".toMediaType()))
+                .header("Authorization", "Bearer $token")
                 .build()
-
             Client.newCall(request).enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
-                    Log.d("GET MESSAGES", "In Response")
-                    if (response.isSuccessful) {
-                        Log.d("GET MESSAGES", "Sucesss")
-                        val responseData = response.body?.string()
-                        val jsonObject = JSONObject(responseData)
-                        val jsonMessages = jsonObject.getJSONArray("messages")
-                        val messages = mutableListOf<ChatMessage>()
-                        Log.d("GET MESSAGES", "Processing")
-                        for (i in 0 until jsonMessages.length()) {
-                            val jsonMessage = jsonMessages.getJSONObject(i)
-                            val gson = Gson()
-                            val message = gson.fromJson(StringReader(jsonMessage.toString()), ChatMessage::class.java)
-                            // Parse other properties of ChatMessage if necessary
-                            messages.add(message)
 
-                        }
-                        promise.complete(messages)
-                    } else {
-                        promise.completeExceptionally(Exception("Failed to fetch messages. Response code: ${response.code}"))
-                    }
                 }
-
                 override fun onFailure(call: Call, e: IOException) {
                     Log.e("JUSTIN", "Error: ${e.message}")
                 }
@@ -212,8 +202,91 @@ class Network {
             Log.e("JUSTIN", "Error: ${e.message}")
         }
 
+    }
+
+
+    //Grabs professor data - Justin
+    fun getProfessorData(): CompletableFuture<Pair<String, LatLng>> {
+        val token = getUserToken()
+        val url = "http://10.0.2.2:8008/account/getProfessor"
+        val promise = CompletableFuture<Pair<String, LatLng>>()
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .header("Authorization", "Bearer $token")
+            .build()
+
+        Client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                var responseBody = response.body!!.string()
+                val gson = Gson()
+                val profData = gson.fromJson(StringReader(responseBody), ProfessorData::class.java)
+                val coord = LatLng(profData.lat, profData.long)
+                val res = Pair(first = profData.profilepic, second = coord)
+                if (!response.isSuccessful) {
+                    promise.complete(res)
+                } else {
+                    promise.complete(res)
+                    Log.d("JUSTIN", responseBody)
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("JUSTIN", "Error: ${e.message}")
+            }
+        })
         return promise
     }
 
 
+
+        fun getChatRoomMessages(room: String): CompletableFuture<List<ChatMessage>> {
+            val promise = CompletableFuture<List<ChatMessage>>()
+            try {
+                val url = "http://10.0.2.2:8008/chatroom/messages/$room"
+                Log.d("GET MESSAGES", url)
+                val request = Request.Builder()
+                    .url(url)
+                    .build()
+
+                Client.newCall(request).enqueue(object : Callback {
+                    override fun onResponse(call: Call, response: Response) {
+                        Log.d("GET MESSAGES", "In Response")
+                        if (response.isSuccessful) {
+                            Log.d("GET MESSAGES", "Sucesss")
+                            val responseData = response.body?.string()
+                            val jsonObject = JSONObject(responseData)
+                            val jsonMessages = jsonObject.getJSONArray("messages")
+                            val messages = mutableListOf<ChatMessage>()
+                            Log.d("GET MESSAGES", "Processing")
+                            for (i in 0 until jsonMessages.length()) {
+                                val jsonMessage = jsonMessages.getJSONObject(i)
+                                val gson = Gson()
+                                val message = gson.fromJson(
+                                    StringReader(jsonMessage.toString()),
+                                    ChatMessage::class.java
+                                )
+                                // Parse other properties of ChatMessage if necessary
+                                messages.add(message)
+
+                            }
+                            promise.complete(messages)
+                        } else {
+                            promise.completeExceptionally(Exception("Failed to fetch messages. Response code: ${response.code}"))
+                        }
+                    }
+
+                    override fun onFailure(call: Call, e: IOException) {
+                        Log.e("JUSTIN", "Error: ${e.message}")
+                    }
+                })
+            } catch (e: Exception) {
+                Log.e("JUSTIN", "Error: ${e.message}")
+            }
+
+            return promise
+        }
 }
+
+
+
