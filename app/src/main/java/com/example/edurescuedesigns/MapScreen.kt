@@ -1,7 +1,9 @@
+
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.location.Location
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -48,15 +50,18 @@ import android.graphics.Color as Color1
 @Composable
 fun MapScreen() {
     val context = LocalContext.current
-    /*
-    TESTING LOCATIONS
+
+    //TESTING LOCATIONS
     var japaneseGarden = LatLng(33.78579047152744, -118.11989238386515)
     var wellnessCenter = LatLng(33.785861807304734, -118.10869147957581)
     var closeToRend = LatLng(33.78393572046006, -118.11332633652312)
-    var outsideCircle = LatLng(33.77690870302229, -118.06496074591993)*/
+    var outsideCircle = LatLng(33.77690870302229, -118.06496074591993)
+    //
 
+    var defaultLocation = LatLng(33.785861807304734, -118.10869147957581)
+    var rendezvousLocation by remember { mutableStateOf(defaultLocation)}
 
-    var currentLocation by remember { mutableStateOf(LatLng(33.78579047152744, -118.11989238386515)) }
+    var currentLocation by remember { mutableStateOf(defaultLocation) }
     var loading by remember { mutableStateOf(false) } // Loading state
 
     //FOR CSULB RADIUS
@@ -77,11 +82,14 @@ fun MapScreen() {
     var user by remember { mutableStateOf(User()) }
 
     //Professor location
+    //Network call to get professor marked location
     var professorMarkerPosition by remember { mutableStateOf(LatLng(0.0, 0.0)) }
     var professorIcon by remember {
         mutableStateOf("")
     }
     var unMarked = LatLng(0.0,0.0)
+    // Megan - Pops up dialog for when student is outside radius
+    var showDialog by remember { mutableStateOf(false) }
 
     fun fetchUserInfo() {
         // Fetch user info only if the user token is not valid
@@ -96,6 +104,8 @@ fun MapScreen() {
                     userIsProfessor.value = true
                 }
 
+
+
             }
         }
     }
@@ -107,6 +117,10 @@ fun MapScreen() {
             if(userIsProfessor.value == false) {
                 professorMarkerPosition = professor.second
                 professorIcon = professor.first
+                currentLocation = japaneseGarden
+            }
+            if(user.type == "test"){
+                currentLocation = japaneseGarden
             }
         }
     }
@@ -148,9 +162,10 @@ fun MapScreen() {
         return intersections % 2 == 1
     }
 
-    val isWithinCSULB = pointInPolygon(currentLocation, csulbPolygon)
+    var isWithinCSULB = pointInPolygon(currentLocation, csulbPolygon)
 
-    val rendezvousLocation = LatLng(33.78332703222142, -118.11434058125548)
+    //Network Call from emergency-plan
+
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.builder()
             .target(rendezvousLocation)
@@ -172,6 +187,7 @@ fun MapScreen() {
             .zoom(17f)
             .build()
     }
+
     //Asks user if we can track location -- Justin
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -201,29 +217,39 @@ fun MapScreen() {
         canvas.drawCircle(radius.toFloat(), radius.toFloat(), radius.toFloat(), paint)
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
-    //Updates user's location - Justin
-    fun updateCurrentLocation() {
+    fun fetchCurrentLocation() {
         // You can use FusedLocationProviderClient to get the updated location
         val fusedLocationProviderClient: FusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(context)
-        val locationResult = fusedLocationProviderClient.lastLocation
-        locationResult.addOnSuccessListener { location ->
+        fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
                 currentLocation = LatLng(location.latitude, location.longitude)
-
+            } else {
+                Log.e("Location", "No location available")
+            }
+        }.addOnFailureListener { e ->
+            Log.e("Location", "Failed to get location: ${e.message}")
         }
 
-        }
     }
-    // Megan - Pops up dialog for when student is outside radius
-    var showDialog by remember { mutableStateOf(false) }
+    //Updates user's location - Justin
+    fun updateCurrentLocation() {
+        fetchCurrentLocation()
+    }
+
 
 
     LaunchedEffect(key1 = true) {
+        Network().getEmergencyPlan().thenAccept { emergencyPlanRes ->
+            val coordinates = emergencyPlanRes.coordinates
+            Log.d("MAP TEST", emergencyPlanRes.toString())
+            rendezvousLocation = LatLng(coordinates.latitude.toDouble(), coordinates.longitude.toDouble())
+        }
         permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         //Gets user info and professor info - justin
         fetchUserInfo()
         fetchProfInfo()
+        fetchCurrentLocation()
 
         if (!isWithinCSULB) {
             showDialog = true
@@ -241,7 +267,7 @@ fun MapScreen() {
             Marker(
                 state = MarkerState(position = rendezvousLocation),
                 title = "Rendezvous Point",
-                snippet = "Horn Center",
+                snippet = "Meet here",
             )
             Marker(state = MarkerState(position = currentLocation), title = "Your Location",
                 snippet = "Current Location", icon = createBlueCircleBitmapDescriptor(20)
@@ -251,6 +277,8 @@ fun MapScreen() {
                     state = MarkerState(position = professorMarkerPosition),
                     title = "Professor's Location",
                     snippet = "Current Professor's Location",
+                    alpha = 0.8F
+
 
                 // You can define this function to create a custom marker icon
                 )
@@ -301,10 +329,9 @@ fun MapScreen() {
                         }
 
                     }
-                },
-                enabled = isWithinCSULB
+                }
             ) {
-                Text(text = "Refresh", color = if (isWithinCSULB) Color.White else Color.Gray)
+                Text(text = "Refresh")
             }
             //Megan - Shows message if user is outside of radius/not on campus
             if (showDialog) {

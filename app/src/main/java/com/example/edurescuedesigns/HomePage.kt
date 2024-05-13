@@ -46,6 +46,7 @@ fun HomePageForm(navController:NavController,shouldShowBottomBar: MutableState<B
         if (!user.validToken) {
             // Fetch user info only if the user token is not valid
             Network().getUserInfo().thenAccept { userRes ->
+                Log.d("TOKEN TEST", userRes.toString())
                 if (userRes.validToken) {
                     Log.d("Token RES", "valid")
                     user = userRes
@@ -53,7 +54,19 @@ fun HomePageForm(navController:NavController,shouldShowBottomBar: MutableState<B
                     if(user.type == "professor"){
                         userIsStudent.value = false
                     }
+                    Network().getEmergencyPlan().thenAccept { emergencyPlanRes ->
+                        emergencyPlan.status = emergencyPlanRes.status
+                        emergencyPlan.instructions = emergencyPlanRes.instructions
+                        if(emergencyPlanRes.status == "active"){
+                            if(user.type == "professor")
+                                emergencyString = emergencyPlanRes.professor_instructions
+                            else
+                                emergencyString = emergencyPlanRes.instructions
+                        }else{
+                            emergencyString = "There is no emergency."
+                        }
 
+                    }
                     shouldShowBottomBar.value = true
                 } else {
                     Log.d("Token RES", "invalid")
@@ -63,16 +76,7 @@ fun HomePageForm(navController:NavController,shouldShowBottomBar: MutableState<B
                 }
             }
 
-            Network().getEmergencyPlan().thenAccept { emergencyPlanRes ->
-                emergencyPlan.is_active = emergencyPlanRes.is_active
-                emergencyPlan.instructions = emergencyPlanRes.instructions
-                if(emergencyPlanRes.is_active){
-                    emergencyString = emergencyPlanRes.instructions
-                }else{
-                    emergencyString = "There is no emergency."
-                }
 
-            }
 
 
         }

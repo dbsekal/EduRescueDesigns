@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubble
@@ -38,7 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.edurescuedesigns.classes.ContextSingleton
 import com.example.edurescuedesigns.classes.Network
 import com.example.edurescuedesigns.ui.theme.AppTheme
-
+import com.google.android.gms.maps.model.LatLng
 
 
 data class TabBarItem(
@@ -54,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ContextSingleton.initialize(this)
         //REMOVE THIS LINE TO SAVE LOGIN DATA
-        Network().removeToken()
+        //Network().removeToken()
 
 
         //Check if user is already logged in
@@ -64,6 +63,9 @@ class MainActivity : AppCompatActivity() {
             if (userRes.validToken) {
                 Log.d("Token RES", "valid")
                 startDestination = "homepage"
+                if(userRes.type == "professor"){
+                    Network().setProfessorMarker(LatLng(0.0,0.0))
+                }
             } else {
                     Log.d("Token RES", "invalid")
             }

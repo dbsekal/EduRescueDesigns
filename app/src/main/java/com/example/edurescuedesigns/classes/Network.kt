@@ -6,6 +6,7 @@ import com.example.edurescuedesigns.datatypes.ChatMessage
 import com.example.edurescuedesigns.datatypes.EmergencyPlan
 import com.example.edurescuedesigns.datatypes.LoginResponse
 import com.example.edurescuedesigns.datatypes.ProfessorData
+import com.example.edurescuedesigns.datatypes.RollCallStudent
 import com.example.edurescuedesigns.datatypes.User
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
@@ -16,6 +17,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import java.io.StringReader
@@ -23,6 +25,8 @@ import java.util.concurrent.CompletableFuture
 
 
 class Network {
+    private val deployedURL = "https://edurescue-backend.onrender.com"
+    //private val deployedURL = "http://10.0.2.2:8008"
     private val MEDIA_TYPE_MARKDOWN = "application/json".toMediaType()
     private val Client = OkHttpClient()
     private val context = ContextSingleton.getInstance().getContext()
@@ -36,7 +40,7 @@ class Network {
         val promise = CompletableFuture<LoginResponse>()
         try {
             Log.d("LOGIN ATTEMPT:", "$email --- $password")
-            val url = "http://10.0.2.2:8008/account/login"
+            val url = "$deployedURL/account/login"
             val json = """
             {
                 "email": "$email",
@@ -107,7 +111,7 @@ class Network {
         val token = getUserToken();
 
         try {
-            val url = "http://10.0.2.2:8008/emergencyplan/user"
+            val url = "$deployedURL/emergencyplan/user"
             val request = Request.Builder()
                 .url(url)
                 .header("Authorization", "Bearer $token")
@@ -136,24 +140,96 @@ class Network {
         return promise
     }
 
+    fun getRollCallStudents(courseID: String): CompletableFuture<List<RollCallStudent>> {
+        val promise = CompletableFuture<List<RollCallStudent>>()
+        try {
+            val url = "$deployedURL/course/$courseID"
+            Log.d("ROLLCALL ID", courseID)
+            val request = Request.Builder()
+                .url(url)
+                .get()
+                .build()
 
+            Client.newCall(request).enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.isSuccessful) {
+                        val responseData = response.body?.string()
+                        val jsonArray = JSONArray(responseData)
+                        val students = mutableListOf<RollCallStudent>()
+
+                        for (i in 0 until jsonArray.length()) {
+                            val jsonStudent = jsonArray.getJSONObject(i)
+                            val gson = Gson()
+                            val student = gson.fromJson(jsonStudent.toString(), RollCallStudent::class.java)
+                            // Parse other properties of RollCallStudent if necessary
+                            students.add(student)
+                        }
+
+                        promise.complete(students)
+                    } else {
+                        promise.completeExceptionally(Exception("Failed to fetch students. Response code: ${response.code}"))
+                    }
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    promise.completeExceptionally(e)
+                }
+            })
+        } catch (e: Exception) {
+            promise.completeExceptionally(e)
+        }
+
+        return promise
+    }
+    fun notifyAbsentStudents(emails: List<String>) {
+        try {
+            val url = "$deployedURL/rollcall/notify-absent"
+            val json = """
+            {
+                "emails": ${Gson().toJsonTree(emails)}
+            }
+        """.trimIndent()
+
+            val request = Request.Builder()
+                .url(url)
+                .post(json.toRequestBody(MEDIA_TYPE_MARKDOWN))
+                .build()
+
+            Client.newCall(request).enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    if (!response.isSuccessful) {
+                        Log.e("NOTIFY ABSENT:", "Failed to send emails. Response code: ${response.code}")
+                    } else {
+                        Log.d("NOTIFY ABSENT:", "Emails sent successfully")
+                    }
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e("NOTIFY ABSENT:", "Error: ${e.message}")
+                }
+            })
+        } catch (e: Exception) {
+            Log.e("NOTIFY ABSENT:", "Error: ${e.message}")
+        }
+    }
 
     fun getUserInfo(): CompletableFuture<User> {
         val promise = CompletableFuture<User>()
 
         val token = getUserToken()
-
+        Log.d("TOKEN CALL TOK", token)
         try {
-            val url = "http://10.0.2.2:8008/account/getinfo"
+            val url = "$deployedURL/account/getinfo"
             val request = Request.Builder()
                 .url(url)
-                .header("Authorization", "Bearer $token")
+                .addHeader("Authorization", "Bearer $token")
                 .build()
             Client.newCall(request).enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
                     var responseBody = response.body!!.string()
                     val gson = Gson()
                     val user = gson.fromJson(StringReader(responseBody), User::class.java)
+                    Log.d("TOKEN CALL", responseBody)
                     if (!response.isSuccessful) {
                         promise.complete(user)
                     } else {
@@ -183,8 +259,10 @@ class Network {
             }"""
         val token = getUserToken()
 
+
+
         try {
-            val url = "http://10.0.2.2:8008/account/setProfessorLocation"
+            val url = "$deployedURL/account/setProfessorLocation"
             val request = Request.Builder()
                 .url(url)
                 .put(json.toRequestBody("application/json".toMediaType()))
@@ -204,11 +282,10 @@ class Network {
 
     }
 
-
     //Grabs professor data - Justin
     fun getProfessorData(): CompletableFuture<Pair<String, LatLng>> {
         val token = getUserToken()
-        val url = "http://10.0.2.2:8008/account/getProfessor"
+        val url = "$deployedURL/account/getProfessor"
         val promise = CompletableFuture<Pair<String, LatLng>>()
         val request = Request.Builder()
             .url(url)
@@ -243,7 +320,7 @@ class Network {
         fun getChatRoomMessages(room: String): CompletableFuture<List<ChatMessage>> {
             val promise = CompletableFuture<List<ChatMessage>>()
             try {
-                val url = "http://10.0.2.2:8008/chatroom/messages/$room"
+                val url = "$deployedURL/chatroom/messages/$room"
                 Log.d("GET MESSAGES", url)
                 val request = Request.Builder()
                     .url(url)

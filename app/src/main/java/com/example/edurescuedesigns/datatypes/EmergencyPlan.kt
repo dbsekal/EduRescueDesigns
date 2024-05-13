@@ -7,6 +7,6 @@ data class Coordinates(
 data class EmergencyPlan(
     var coordinates : Coordinates = Coordinates(),
     var instructions : String = "",
-    var is_active : Boolean = false,
-    var is_test : Boolean = false
+    var professor_instructions: String = "",
+    var status : String = "",
 )

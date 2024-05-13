@@ -1,5 +1,6 @@
 package com.example.edurescuedesigns.classes
 
+import android.util.Log
 import com.example.edurescuedesigns.datatypes.ChatMessage
 import com.example.edurescuedesigns.datatypes.User
 import io.socket.client.IO
@@ -14,7 +15,8 @@ import java.net.URISyntaxException
 class SocketManager private constructor() {
 
     private val socket: Socket
-
+    private val deployedURL = "https://edurescue-backend.onrender.com"
+    private val testURL = "http://10.0.2.2:8008"
     //Using mutable share flow to give state to messages in UI
     private val _messageFlow = MutableSharedFlow<ChatMessage>()
     val messageFlow: Flow<ChatMessage> = _messageFlow.asSharedFlow()
@@ -22,11 +24,14 @@ class SocketManager private constructor() {
     init {
         //When init we create a socket with our Node.js backend
         socket = try {
-            IO.socket("http://10.0.2.2:8000")
-        } catch (e: URISyntaxException) {
-            throw IllegalArgumentException("Invalid URI", e)
+            IO.socket(deployedURL)
         }
 
+        catch (e: URISyntaxException) {
+            Log.d("SOCKET", "LOG SOCKET ERROR ${e}")
+            throw IllegalArgumentException("Invalid URI", e)
+        }
+        Log.d("SOCKET", "LOG SOCKET SUCCESS")
         socket.connect()
 
         socket.on(Socket.EVENT_CONNECT) {
