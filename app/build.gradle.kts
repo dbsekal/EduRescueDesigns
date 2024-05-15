@@ -63,6 +63,9 @@ android {
 }
 
 dependencies {
+    //Setting
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1")
     //Maps
     //noinspection GradleCompatible
     implementation("com.google.android.gms:play-services-maps:18.2.0")

@@ -35,18 +35,18 @@ import com.example.edurescuedesigns.ui.theme.*
 
 
 @Composable
-fun Settings(navController: NavController) {
+fun Settings(navController: NavController, viewModel: ThemeViewModel) {
     // Save user's preferences after navigating to a different page in app
     val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LocalContext.current)
     var notificationsEnabled by remember { mutableStateOf(sharedPreferences.getBoolean("notifications", true)) }
     val isDarkModeInitialValue = isSystemInDarkTheme()
-    var isDarkMode by remember { mutableStateOf(sharedPreferences.getBoolean("darkMode", isDarkModeInitialValue)) }
+    var darkModeToggle by remember { mutableStateOf(sharedPreferences.getBoolean("darkMode", isDarkModeInitialValue)) }
 
     // Save pref to SharedPreferences
     fun savePreferences() {
         with(sharedPreferences.edit()) {
             putBoolean("notifications", notificationsEnabled)
-            putBoolean("darkMode", isDarkMode)
+            putBoolean("darkMode", darkModeToggle)
             apply()
         }
     }
@@ -56,68 +56,59 @@ fun Settings(navController: NavController) {
         savePreferences()
     }
 
+    // calling the viewmodel theme for dark mode
     val toggleDarkMode: (Boolean) -> Unit = { enabled ->
-        isDarkMode = enabled
+        darkModeToggle = enabled
+        viewModel.toggleDarkMode()
         savePreferences()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        AppTheme(
-            darkTheme = isDarkMode,
-            dynamicColor = false,
-            content = {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Settings", fontSize = 30.sp)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    // Toggle for notifications
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .padding(end = 30.dp)) {
-                        Text("Notifications")
-                        Spacer(modifier = Modifier.weight(0.5f))
-                        Switch(
-                            checked = notificationsEnabled,
-                            onCheckedChange = toggleNotifications,
-                            modifier = Modifier.size(5.dp)
-                        )
-                    }
-                    HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .padding(end = 30.dp)) {
-                        Text("Dark Mode")
-                        Spacer(modifier = Modifier.weight(0.5f))
-                        Switch(
-                            checked = isDarkMode,
-                            onCheckedChange = toggleDarkMode,
-                            modifier = Modifier.size(10.dp)
-                        )
-                    }
-                    HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .padding(end = 30.dp)) {
-                        Text("Languages")
-                        Spacer(modifier = Modifier.weight(0.5f))
-                    }
-                }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Settings", fontSize = 30.sp)
+            Spacer(modifier = Modifier.height(16.dp))
+            // Toggle for notifications
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .padding(end = 30.dp)) {
+                Text("Notifications")
+                Spacer(modifier = Modifier.weight(0.5f))
+                Switch(
+                    checked = notificationsEnabled,
+                    onCheckedChange = toggleNotifications,
+                    modifier = Modifier.size(5.dp)
+                )
             }
-        )
+            HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .padding(end = 30.dp)) {
+                Text("Dark Mode")
+                Spacer(modifier = Modifier.weight(0.5f))
+                Switch(
+                    checked = darkModeToggle,
+                    onCheckedChange = toggleDarkMode,
+                    modifier = Modifier.size(10.dp)
+                )
+            }
+            HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .padding(end = 30.dp)) {
+                Text("Languages")
+                Spacer(modifier = Modifier.weight(0.5f))
+            }
+        }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    Settings(navController = rememberNavController())
-}

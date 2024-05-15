@@ -16,9 +16,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -60,9 +62,7 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
 
     var chatMessages by remember { mutableStateOf(listOf<ChatMessage>()) }
     var newMessage by remember { mutableStateOf("") }
-    // State variable to track whether email box should be shown
-    var showEmailBox by remember { mutableStateOf(false) }
-
+    var showDialog by remember { mutableStateOf(false) }
     // State variable to store the email of the clicked user
     var clickedUserEmail by remember { mutableStateOf("") }
     var user by remember { mutableStateOf(User()) }
@@ -116,10 +116,6 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
             .fillMaxWidth()
             .weight(1f),
             contentAlignment = Alignment.TopStart
-//            .padding(16.dp)
-//            .verticalScroll(state = scrollState)
-//            .height(spacerHeight.dp)
-//            .background(color = Color.Blue)
         ) {
             // Display chat messages
             Column(
@@ -144,26 +140,35 @@ fun ChatRoomScreen(socketManager: SocketManager = SocketManager.getInstance(), n
                             })",
                             modifier = Modifier.clickable {
                                 // Show the email box when the user's name is clicked
-                                showEmailBox = true
+                                showDialog = true
                                 clickedUserEmail = chatMessage.email
                             }
                         )
                     }
                 }
-                if (showEmailBox) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .background(Color.Blue)
-                            .clickable {
-                                // Hide the email box when clicked
-                                showEmailBox = false
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("Email: $clickedUserEmail")
-                    }
+                if (showDialog){
+                    AlertDialog(
+                        onDismissRequest = {
+                            showDialog = false
+                        },
+                        title = {
+                            Text(text = "User Email")
+                        },
+                        text = {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text("Email: $clickedUserEmail")
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    showDialog = false
+                                }
+                            ) {
+                                Text("Close")
+                            }
+                        }
+                    )
                 }
 
             }

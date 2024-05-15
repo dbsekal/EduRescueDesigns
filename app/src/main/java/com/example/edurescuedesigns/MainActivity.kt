@@ -26,7 +26,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -53,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ContextSingleton.initialize(this)
         //REMOVE THIS LINE TO SAVE LOGIN DATA
-        //Network().removeToken()
+        Network().removeToken()
 
 
         //Check if user is already logged in
@@ -82,8 +85,10 @@ class MainActivity : AppCompatActivity() {
             val tabBarItemsProfessor = listOf(homeTab, chatroomTab,mapTab,rollcallTab)
             var shouldShowBottomBar = rememberSaveable { mutableStateOf(false) }
             var userIsStudent = rememberSaveable { mutableStateOf(true) }
-
-            AppTheme {
+            val themeViewModel = remember { ThemeViewModel()}
+            val themeState by themeViewModel.uiState.collectAsState()
+            // App's children will inherit theme if user selects dark mode
+            AppTheme(themeState) {
                 val navController = rememberNavController()
                 Surface (
                     modifier = Modifier.fillMaxSize(),
@@ -124,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                                 Profile(navController)
                             }
                             composable(route ="settings"){
-                                Settings(navController)
+                                Settings(navController, themeViewModel)
                             }
 
                         }
